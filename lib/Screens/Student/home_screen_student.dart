@@ -63,6 +63,37 @@ class _StudentHomePage extends State<StudentHomePage> {
         backgroundColor: Colors.blue,
       ),
       drawer: MyNavigationDrawer(allCourses: allCourses, isTeacher: false),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Enter class code'),
+                content: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Enter code',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // TODO: Add the course to the list
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: const Icon(Icons.add),
+      ),
       body: AllCoursesList(allCourses: allCourses),
     );
   }
