@@ -1,7 +1,8 @@
+import 'package:ClassMate/Screens/Student/home_screen_student.dart';
+import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ClassMate/bluetooth/advertising.dart';
-import 'Screens/home_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const TeacherHomePage(),
     );
   }
 }

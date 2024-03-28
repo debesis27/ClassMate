@@ -1,73 +1,9 @@
 import 'package:ClassMate/Login/login_screen.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/Screens/Student/home_screen_student.dart';
+import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:flutter/material.dart';
 import 'Student/course_details.dart';
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  List<Course> allCourses = [
-    Course(
-      name: 'MA517',
-      title: 'Distributed Algorithms',
-      academicYear: '2023-24',
-      instructor: 'Kaushik Mondal',
-      image: 'assets/mathematics.jpg',
-    ),
-    Course(
-      name: 'MA302',
-      title: 'Optimization Techniques',
-      academicYear: '2023-24',
-      instructor: 'Arti Pandey',
-      image: 'assets/physics.jpg',
-    ),
-    Course(
-      name: 'HS301',
-      title: 'Operation Management',
-      academicYear: '2023-24',
-      instructor: 'Ravi Kumar',
-      image: 'assets/chemistry.jpg',
-    ),
-    Course(
-      name: 'CS503',
-      title: 'Machine Learning',
-      academicYear: '2023-24',
-      instructor: 'Shashi Shekhar Jha',
-      image: 'assets/biology.jpg',
-    ),
-    Course(
-      name: 'CS204',
-      title: 'Computer Architecture',
-      academicYear: '2023-24',
-      instructor: 'Neeraj Goel',
-      image: 'assets/history.jpg',
-    ),
-    Course(
-      name: 'CP301',
-      title: 'DEP',
-      academicYear: '2023-24',
-      instructor: 'Arti Pandey',
-      image: 'assets/english.jpg',
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Student Classes'),
-        backgroundColor: Colors.blue,
-      ),
-      drawer: NavigationDrawer(allCourses: allCourses),
-      body: AllCoursesList(allCourses: allCourses),
-    );
-  }
-}
 
 class AllCoursesList extends StatelessWidget {
   const AllCoursesList({
@@ -114,7 +50,7 @@ class AllCoursesList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${course.name} - ${course.title}',
+                          '${course.code} - ${course.title}',
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -154,16 +90,30 @@ class AllCoursesList extends StatelessWidget {
   }
 }
 
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({
+class MyNavigationDrawer extends StatefulWidget {
+  const MyNavigationDrawer({
     super.key,
     required this.allCourses,
+    required this.isTeacher,
   });
 
   final List<Course> allCourses;
+  final bool isTeacher;
 
   @override
+  State<MyNavigationDrawer> createState() => _MyNavigationDrawerState();
+}
+
+class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
+  @override
   Widget build(BuildContext context) {
+    Widget homePage;
+    if(widget.isTeacher) {
+      homePage = const TeacherHomePage();
+    } else {
+      homePage = const StudentHomePage();
+    }
+    
     return Drawer(
       child: ListView(
         children: [
@@ -200,7 +150,7 @@ class NavigationDrawer extends StatelessWidget {
             onTap: () {
               // Handle Classes button tap
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()));
+                  MaterialPageRoute(builder: (context) => homePage));
             },
           ),
           ListTile(
@@ -219,9 +169,9 @@ class NavigationDrawer extends StatelessWidget {
             ),
           ),
           Column(
-            children: allCourses.map((course) {
+            children: widget.allCourses.map((course) {
               return ListTile(
-                title: Text(course.name),
+                title: Text(course.code),
                 onTap: () {
                   Navigator.push(
                     context,

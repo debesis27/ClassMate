@@ -1,6 +1,6 @@
+import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:flutter/material.dart';
-import '../../Models/course_info_model.dart';
-import '../../bluetooth/ble_scan.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   final Course course;
@@ -13,7 +13,7 @@ class CourseDetailScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(course.name),
+          title: Text(course.code),
           backgroundColor: Colors.blue,
           bottom: const TabBar(
             tabs: [
@@ -28,7 +28,7 @@ class CourseDetailScreen extends StatelessWidget {
               child: Ble_Body(),
             ),
             Center(
-              child: Text('Stats for ${course.name}'),
+              child: Text('Stats for ${course.code}'),
             ),
           ],
         ),
