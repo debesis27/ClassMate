@@ -60,7 +60,7 @@ class _TeacherHomePage extends State<TeacherHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Classes'),
+        title: const Text('Teacher Classes'),
         backgroundColor: Colors.blue,
       ),
       drawer: MyNavigationDrawer(allCourses: allCourses, isTeacher: true),
