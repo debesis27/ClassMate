@@ -56,9 +56,9 @@ class MainActivity: FlutterActivity() {
 
         val data = AdvertiseData.Builder()
             .setIncludeDeviceName(false)
-            .setIncludeTxPowerLevel(true)
+            .setIncludeTxPowerLevel(false)
             .addServiceUuid(ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB")) // replace with your service UUID
-            .addServiceData(ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB"), "hi".toByteArray(Charset.forName("UTF-8"))) // replace with your service UUID and message
+            .addServiceData(ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB"), "2021mcb1181".toByteArray(Charset.forName("UTF-8"))) // replace with your service UUID and message
             .build()
 
         advertiser.startAdvertising(settings, data, object : AdvertiseCallback() {

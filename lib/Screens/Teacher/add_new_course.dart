@@ -1,3 +1,4 @@
+import 'package:ClassMate/Class/NewClassFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
 
@@ -18,9 +19,10 @@ class _AddNewCourse extends State<AddNewCourse> {
       code: courseCode,
       title: courseTitle,
       academicYear: academicYear,
-      instructor: 'Kaushik Mondal',
+      instructor: 'abc@gmail.com',
       image: 'assets/mathematics.jpg',
     );
+    // firebaseclasssetup(courseCode, courseTitle, academicYear, newCourse.instructor, newCourse.image);
   }
 
   @override
