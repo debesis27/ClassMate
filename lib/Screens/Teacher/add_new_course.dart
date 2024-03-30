@@ -42,7 +42,7 @@ class _AddNewCourse extends State<AddNewCourse> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
-                    margin: const EdgeInsets.only(top: 20.0,bottom: 10.0),
+                    margin: const EdgeInsets.only(top: 20.0, bottom: 10.0),
                     child: const Text(
                       'Course Code',
                       style: TextStyle(
@@ -141,16 +141,29 @@ class _AddNewCourse extends State<AddNewCourse> {
               ],
             ),
             ElevatedButton(
-                    onPressed: saveInputs,
-                    style: ElevatedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      minimumSize: const Size(double.infinity, 48.0),
-                    ),
-                    child: const Text('Save'),
-                  ),
+              onPressed: saveInputs,
+              style: ElevatedButton.styleFrom(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                minimumSize: const Size(double.infinity, 48.0),
+              ),
+              child: const Text('Save'),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: OutlinedButton.styleFrom(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                minimumSize: const Size(double.infinity, 48.0),
+              ),
+              child: const Text('Cancel'),
+              )
           ],
         ),
       )),
