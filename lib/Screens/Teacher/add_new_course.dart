@@ -22,7 +22,7 @@ class _AddNewCourse extends State<AddNewCourse> {
       instructor: 'abc@gmail.com',
       image: 'assets/mathematics.jpg',
     );
-    // firebaseclasssetup(courseCode, courseTitle, academicYear, newCourse.instructor, newCourse.image);
+    firebaseclasssetup(courseCode, courseTitle, academicYear, newCourse.instructor, newCourse.image);
   }
 
   @override

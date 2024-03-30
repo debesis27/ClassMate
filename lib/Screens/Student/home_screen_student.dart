@@ -1,3 +1,4 @@
+import 'package:ClassMate/Firebase/JoinClassFirebase.dart';
 import 'package:ClassMate/Screens/common_screen_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
@@ -79,6 +80,7 @@ class _StudentHomePage extends State<StudentHomePage> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
+                      // joinClassFirebase('student1@gmai.com', 'a c abc@gmail.com'); call this fucntion
                       // TODO: Add the course to the list
                     },
                     child: const Text('Submit'),

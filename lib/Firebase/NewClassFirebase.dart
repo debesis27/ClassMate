@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 String firebaseclasssetup(String courseCode, String courseTitle, String academicYear, String instructorId, String image){
+  // need to add class info to user in the database
   final db = FirebaseFirestore.instance;
   final course = <String, dynamic>{
     'code': courseCode,
