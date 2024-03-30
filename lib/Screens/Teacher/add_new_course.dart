@@ -1,4 +1,4 @@
-import 'package:ClassMate/Class/NewClassFirebase.dart';
+import 'package:ClassMate/Firebase/NewClassFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
 
