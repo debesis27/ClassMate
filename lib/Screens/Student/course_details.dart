@@ -1,3 +1,5 @@
+// Move this out this is a common widget
+
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ class CourseDetailScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(course.code),
+          title: Text(course.courseCode),
           backgroundColor: Colors.blue,
           bottom: const TabBar(
             tabs: [
@@ -28,7 +30,7 @@ class CourseDetailScreen extends StatelessWidget {
               child: Ble_Body(),
             ),
             Center(
-              child: Text('Stats for ${course.code}'),
+              child: Text('Stats for ${course.courseCode}'),
             ),
           ],
         ),
