@@ -4,15 +4,18 @@ import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'Student/course_details.dart';
+import 'Student/course_details_student.dart';
+import 'Teacher/course_details_teacher.dart';
 
 class AllCoursesList extends StatelessWidget {
   const AllCoursesList({
     super.key,
     required this.allCourses,
+    required this.isTeacher,
   });
 
   final List<Course> allCourses;
+  final bool isTeacher;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,9 @@ class AllCoursesList extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CourseDetailScreen(course: course),
+                    builder: (context) => isTeacher
+                      ? TeacherCourseDetailScreen(course: course)
+                      : StudentCourseDetailScreen(course: course),
                   ),
                 );
               },
@@ -184,7 +189,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CourseDetailScreen(course: course),
+                      builder: (context) => StudentCourseDetailScreen(course: course),
                     ),
                   );
                 },
@@ -196,8 +201,6 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     );
   }
 }
-
-
 
 
 class AccountPage extends StatefulWidget {
