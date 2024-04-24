@@ -89,13 +89,17 @@ class _TeacherHomePage extends State<TeacherHomePage> {
               auth: auth,
               user: user,
             ),
-            body: AllCoursesList(allCourses: allCourses),
+            body: AllCoursesList(
+              allCourses: allCourses,
+              isTeacher: true,
+            ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AddNewCourse(user: user)),
+                    builder: (context) => AddNewCourse(user: user)
+                  ),
                 );
               },
               backgroundColor: Colors.blue,

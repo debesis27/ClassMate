@@ -98,7 +98,7 @@ class _StudentHomePage extends State<StudentHomePage> {
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: 'Enter code',
+                          hintText: 'Enter Class code',
                         ),
                       ),
                       actions: [
@@ -120,7 +120,7 @@ class _StudentHomePage extends State<StudentHomePage> {
               ),
               child: const Icon(Icons.add),
             ),
-            body: AllCoursesList(allCourses: allCourses),
+            body: AllCoursesList(allCourses: allCourses, isTeacher: false),
           );
         }
       },

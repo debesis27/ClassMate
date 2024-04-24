@@ -1,13 +1,11 @@
-// Move this out this is a common widget
-
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:flutter/material.dart';
 
-class CourseDetailScreen extends StatelessWidget {
+class StudentCourseDetailScreen extends StatelessWidget {
   final Course course;
 
-  const CourseDetailScreen({super.key, required this.course});
+  const StudentCourseDetailScreen({super.key, required this.course});
 
   @override
   Widget build(BuildContext context) {
