@@ -12,10 +12,12 @@ class AllCoursesList extends StatelessWidget {
     super.key,
     required this.allCourses,
     required this.isTeacher,
+    required this.database,
   });
 
   final List<Course> allCourses;
   final bool isTeacher;
+  final Database database;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +35,8 @@ class AllCoursesList extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => isTeacher
-                      ? TeacherCourseDetailScreen(course: course)
-                      : StudentCourseDetailScreen(course: course),
+                      ? TeacherCourseDetailScreen(course: course, database: database,)
+                      : StudentCourseDetailScreen(course: course, database: database,),
                   ),
                 );
               },
@@ -99,15 +101,19 @@ class AllCoursesList extends StatelessWidget {
 class MyNavigationDrawer extends StatefulWidget {
   final FirebaseAuth auth;
   final User user;
+  final Database database;
   final bool isTeacher;
   final List<Course> allCourses;
+  final String currentPage;
 
   const MyNavigationDrawer({
     super.key,
     required this.isTeacher,
     required this.auth,
     required this.user,
+    required this.database,
     required this.allCourses,
+    required this.currentPage,
   });
 
   @override
@@ -153,17 +159,13 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
           ListTile(
             title: const Text('Account'),
             onTap: () {
-              // Handle Account button tap
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user)));
+              widget.currentPage == "Account" ? Navigator.pop(context) : Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user)));
             },
           ),
           ListTile(
             title: const Text('Classes'),
             onTap: () {
-              // Handle Classes button tap
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => homePage));
+              widget.currentPage == "Classes" ? Navigator.pop(context) : Navigator.push(context, MaterialPageRoute(builder: (context) => homePage));
             },
           ),
           ListTile(
@@ -189,7 +191,9 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => StudentCourseDetailScreen(course: course),
+                      builder: (context) => widget.isTeacher
+                        ? TeacherCourseDetailScreen(course: course, database: widget.database)
+                        : StudentCourseDetailScreen(course: course, database: widget.database),
                     ),
                   );
                 },
