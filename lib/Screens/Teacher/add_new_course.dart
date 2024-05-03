@@ -1,4 +1,5 @@
 // import 'package:ClassMate/Firebase/NewClassFirebase.dart';
+import 'package:ClassMate/Datasource/images_data.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:ClassMate/Models/course_info_model.dart';
 class AddNewCourse extends StatefulWidget {
   final User user;
 
-  AddNewCourse({super.key, required this.user});
+  const AddNewCourse({super.key, required this.user});
   @override
   State<AddNewCourse> createState() => _AddNewCourseState();
 }
@@ -16,6 +17,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
   String courseTitle = '';
   String courseCode = '';
   String academicYear = '';
+  int selectedImageIndex = 0;
 
   void saveInputs(user) async {
     Database database = Database(user: user);
@@ -29,44 +31,11 @@ class _AddNewCourseState extends State<AddNewCourse> {
         instructorName: user.displayName ?? "",
         academicYear: academicYear,
         instructorUid: user.uid,
-        image: r'assets/mathematics.jpg'));
+        image: selectedImageIndex.toString(),
+        ));
     teachingCoursesId.add(courseId);
     Database(user: user).updateTeacherCourses(teachingCoursesId);
-    Navigator.pop(context, true);
-    String output = 'Course created with Course ID: $courseId';
-    //TODO: Make it better
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          Future.delayed(const Duration(seconds: 1), () {
-            Navigator.of(context).pop(true); // pop dialog box after 1 sec.
-          });
-          return AlertDialog(
-            content: Text(
-              output,
-              style: const TextStyle(fontSize: 18),
-            ),
-          );
-        });
-    // firebaseclasssetup(courseCode, courseTitle, academicYear, newCourse.instructor, newCourse.image);
   }
-
-  // void courseCreationFailure() {
-  //   Navigator.pop(context, true);
-  //   showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         Future.delayed(const Duration(seconds: 1), () {
-  //           Navigator.of(context).pop(true); // pop dialog box after 1 sec.
-  //         });
-  //         return const AlertDialog(
-  //           content: Text(
-  //             'Course creation failed.',
-  //             style: TextStyle(fontSize: 20),
-  //           ),
-  //         );
-  //       });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,9 +155,65 @@ class _AddNewCourseState extends State<AddNewCourse> {
               ],
             ),
             //TODO: Add image upload
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: images.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedImageIndex = index;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ColorFiltered(
+                            colorFilter: selectedImageIndex == index
+                                ? const ColorFilter.mode(
+                                    Colors.grey, BlendMode.overlay)
+                                : const ColorFilter.mode(
+                                    Colors.transparent, BlendMode.saturation),
+                            child: Image(
+                              image: images[index].image,
+                              fit: BoxFit.cover,
+                              width: 250,
+                              height: 80,
+                            ),
+                          ),
+                          if (selectedImageIndex == index)
+                            const Positioned(
+                              right: 120,
+                              bottom: 40,
+                              child: Icon(
+                                Icons.circle,
+                                color: Colors.white,
+                              ),
+                            ),
+                          if (selectedImageIndex == index)
+                            const Positioned(
+                              right: 120,
+                              bottom: 40,
+                              child: Icon(
+                                Icons.check_circle,
+                                color: Colors.black,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
             ElevatedButton(
               onPressed: () {
                 saveInputs(user);
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 shape: const RoundedRectangleBorder(

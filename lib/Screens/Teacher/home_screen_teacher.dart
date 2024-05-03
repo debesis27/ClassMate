@@ -9,9 +9,11 @@ import 'package:ClassMate/Models/course_info_model.dart';
 class TeacherHomePage extends StatefulWidget {
   final FirebaseAuth auth;
   final User user;
+  
   const TeacherHomePage({super.key, required this.auth, required this.user});
 
   @override
+  // ignore: library_private_types_in_public_api
   _TeacherHomePage createState() => _TeacherHomePage();
 }
 

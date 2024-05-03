@@ -103,7 +103,7 @@ class Database {
           instructorName: doc['Instructor Name'],
           academicYear: doc['Academic Year'],
           instructorUid: doc['Instructor Uid'],
-          image: 'assets/images/placeholder.png',
+          image: doc['image'],
         ));
       }
     });

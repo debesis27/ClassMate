@@ -11,55 +11,11 @@ class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key, required this.auth, required this.user});
 
   @override
+  // ignore: library_private_types_in_public_api
   _StudentHomePage createState() => _StudentHomePage();
 }
 
 class _StudentHomePage extends State<StudentHomePage> {
-  // List<Course> allCourses = [
-  //   Course(
-  //     code: 'MA517',
-  //     title: 'Distributed Algorithms',
-  //     academicYear: '2023-24',
-  //     instructor: 'Kaushik Mondal',
-  //     image: 'assets/mathematics.jpg',
-  //   ),
-  //   Course(
-  //     code: 'MA302',
-  //     title: 'Optimization Techniques',
-  //     academicYear: '2023-24',
-  //     instructor: 'Arti Pandey',
-  //     image: 'assets/physics.jpg',
-  //   ),
-  //   Course(
-  //     code: 'HS301',
-  //     title: 'Operation Management',
-  //     academicYear: '2023-24',
-  //     instructor: 'Ravi Kumar',
-  //     image: 'assets/chemistry.jpg',
-  //   ),
-  //   Course(
-  //     code: 'CS503',
-  //     title: 'Machine Learning',
-  //     academicYear: '2023-24',
-  //     instructor: 'Shashi Shekhar Jha',
-  //     image: 'assets/biology.jpg',
-  //   ),
-  //   Course(
-  //     code: 'CS204',
-  //     title: 'Computer Architecture',
-  //     academicYear: '2023-24',
-  //     instructor: 'Neeraj Goel',
-  //     image: 'assets/history.jpg',
-  //   ),
-  //   Course(
-  //     code: 'CP301',
-  //     title: 'DEP',
-  //     academicYear: '2023-24',
-  //     instructor: 'Arti Pandey',
-  //     image: 'assets/english.jpg',
-  //   ),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     final FirebaseAuth auth = widget.auth;

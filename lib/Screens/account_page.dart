@@ -9,8 +9,9 @@ class AccountPage extends StatefulWidget {
   final FirebaseAuth auth;
   final User user;
   final List<Course> allCourses;
+  final bool isTeacher;
 
-  const AccountPage({super.key, required this.auth, required this.user, required this.allCourses});
+  const AccountPage({super.key, required this.auth, required this.user, required this.allCourses, required this.isTeacher});
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -28,7 +29,7 @@ class _AccountPageState extends State<AccountPage> {
         backgroundColor: Colors.blue,
       ),
       drawer: MyNavigationDrawer(
-        isTeacher: false,
+        isTeacher: widget.isTeacher,
         auth: auth,
         user: user,
         database: Database(user: user),
@@ -63,6 +64,9 @@ class _AccountPageState extends State<AccountPage> {
                   fontSize: 20,
                 ),
               ),
+              Text(
+                widget.isTeacher ? "Teacher" : "Student",
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 16),
                 child: ElevatedButton(
@@ -91,6 +95,7 @@ class _AccountPageState extends State<AccountPage> {
                                   Database(user: user).deleteUser();
                                   auth.signOut();
                                   Navigator.pop(context, true);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SignInPage()));
                                 },
                                 child: const Text('Delete Account'),
                               ),

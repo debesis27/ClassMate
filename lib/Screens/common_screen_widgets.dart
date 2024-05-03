@@ -2,11 +2,13 @@ import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Screens/Student/home_screen_student.dart';
 import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/Screens/account_page.dart';
+import 'package:ClassMate/Screens/common_utils.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'Student/course_details_student.dart';
 import 'Teacher/course_details_teacher.dart';
+import '../Datasource/images_data.dart';
 
 class AllCoursesList extends StatelessWidget {
   const AllCoursesList({
@@ -47,7 +49,7 @@ class AllCoursesList extends StatelessWidget {
                     height: 150,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(course.image),
+                        image: images[stringToInt(course.image)].image,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -165,7 +167,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
               : {
                 Navigator.pop(context),
                 Navigator.pop(context),
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user, allCourses: widget.allCourses,)))
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user, allCourses: widget.allCourses, isTeacher: widget.isTeacher)))
               };
             },
           ),
