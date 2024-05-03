@@ -14,6 +14,7 @@ class Database {
   List<String> studyingCoursesId = [];
 
 
+  // Checks if the user is a teacher
   Future<bool> isTeacher() async {
     final User user = this.user;
     DocumentSnapshot doc = await usersCollection.doc(user.uid).get();
@@ -23,7 +24,7 @@ class Database {
     return doc['isTeacher'];
   }
 
-  // For new user if Teacher
+  // Sets up the teacher's collection for a new user
   void setTeachersCollection() async {
     return await usersCollection.doc(user.uid).set({
       'Name': user.displayName ?? "",
@@ -34,7 +35,7 @@ class Database {
     });
   }
 
-  // For new user if Student
+  // Sets up the student's collection for a new user
   void setStudentsCollection() async{
     return await usersCollection.doc(user.uid).set({
       'Name': user.displayName ?? "",
@@ -45,21 +46,22 @@ class Database {
     });
   }
 
-  
+  // Deletes the user from the database
   Future<void> deleteUser(){
     return usersCollection.doc(user.uid).delete();
   }
-  
-  
+
+  // Updates the teacher's courses
   void updateTeacherCourses(List<String> coursesIdList) async{
     return await usersCollection.doc(user.uid).update({'teachingCoursesId' : coursesIdList});
   }
-  
+
+  // Updates the student's courses
   void updateStudentCourses(List<String> courseIdList) async{
     return await usersCollection.doc(user.uid).update({'studyingCoursesId' : courseIdList});
   }
 
-  // For new course
+  // Adds a new course to the database
   Future<String> addCourse(Course course) async{
     DocumentReference courseRef =  await courseCollection.add({
       'Title': course.courseTitle,
@@ -76,6 +78,13 @@ class Database {
     return courseId;
   }
 
+  // Deletes a course from the database
+  void deleteCourse(String courseId) async {
+    // TODO: Check if this works
+    await courseCollection.doc(courseId).delete();
+  }
+
+  // Adds a user to a course
   void addUserToCourse({required String courseId, required List<String> studentsNameList, required List<String> studentsUidList}) async{
     return await courseCollection.doc(courseId).update({
       'Students Name': studentsNameList,
@@ -83,10 +92,11 @@ class Database {
     });
   }
 
+  // Retrieves all courses from the database
   List<Course> getAllCourses(){
     List<Course> courses = [];
     courseCollection.get().then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         courses.add(Course(
           courseTitle: doc['Title'],
           courseCode: doc['Code'],
@@ -95,11 +105,12 @@ class Database {
           instructorUid: doc['Instructor Uid'],
           image: 'assets/images/placeholder.png',
         ));
-      });
+      }
     });
     return courses;  
   }
 
+  // Retrieves the courses of the current user
   Future<List<Course>> getUserCourses() async {
     bool isTeacher = await this.isTeacher();
     List<Course> courses = [];
@@ -141,8 +152,9 @@ class Database {
     return courses;
   }
 
-  Future<void> joinCourse(String CourseId) async {
-    DocumentSnapshot doc = await courseCollection.doc(CourseId).get();
+  // Joins a user to a course
+  Future<void> joinCourse(String courseId) async {
+    DocumentSnapshot doc = await courseCollection.doc(courseId).get();
     List<String> studentsName = List<String>.from(doc['Students Name']);
     List<String> studentsUid = List<String>.from(doc['Students Uid']);
     studentsName.add(user.displayName ?? "");
@@ -150,11 +162,32 @@ class Database {
     List<String> studyingCoursesId = [];
     DocumentSnapshot userDoc = await usersCollection.doc(user.uid).get();
     studyingCoursesId = List<String>.from(userDoc['studyingCoursesId']);
-    studyingCoursesId.add(CourseId);
+    studyingCoursesId.add(courseId);
     await usersCollection.doc(user.uid).update({'studyingCoursesId' : studyingCoursesId});
-    return await courseCollection.doc(CourseId).update({
+    return await courseCollection.doc(courseId).update({
       'Students Name': studentsName,
       'Students Uid': studentsUid
     });
+  }
+
+  // User leaves a course
+  void leaveCourse(String courseId) async {
+    // TODO: Add functionality
+  }
+
+  // Add student to a course
+  Future<void> addStudentToCourse(String studentEntryNumber) async {
+    //TODO: Add student to a course
+  }
+
+  // Remove student from a course
+  Future<void> removeStudentFromCourse(String studentEntryNumber) async {
+    //TODO: add functionality
+  }
+
+  // Gets Course Id
+  Future<String> getCourseId(String courseCode, String academicYear, String instructorUid) async {
+    QuerySnapshot querySnapshot = await courseCollection.where('Code', isEqualTo: courseCode).where('Academic Year', isEqualTo: academicYear).where('Instructor Uid', isEqualTo: instructorUid).get();
+    return querySnapshot.docs[0].id;
   }
 }

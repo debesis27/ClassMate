@@ -88,10 +88,13 @@ class _TeacherHomePage extends State<TeacherHomePage> {
               isTeacher: true,
               auth: auth,
               user: user,
+              database: database,
+              currentPage: "Classes",
             ),
             body: AllCoursesList(
               allCourses: allCourses,
               isTeacher: true,
+              database: database,
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {

@@ -7,7 +7,9 @@ import 'package:ClassMate/Models/course_info_model.dart';
 class StudentHomePage extends StatefulWidget {
   final FirebaseAuth auth;
   final User user;
+  
   const StudentHomePage({super.key, required this.auth, required this.user});
+
   @override
   _StudentHomePage createState() => _StudentHomePage();
 }
@@ -62,14 +64,12 @@ class _StudentHomePage extends State<StudentHomePage> {
   Widget build(BuildContext context) {
     final FirebaseAuth auth = widget.auth;
     final User user = widget.user;
-    Database database = Database(user: user);
-    String courseCode = '';
-    // List<Course> allCourses = [Course(courseTitle: 'Machine Learning', courseCode: 'CS503', instructorName: 'Shewta', academicYear: '2024', instructorUid: '2342187489', image: 'assets\mathematics.jpg'),];
-    
+    Database database = Database(user: user);    
     return FutureBuilder(
       future: database.getUserCourses(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
+          //TODO: Add skeletal loading screen
           return CircularProgressIndicator(); // Show a loading spinner while waiting
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}'); // Show error if there is any
@@ -78,52 +78,78 @@ class _StudentHomePage extends State<StudentHomePage> {
           
           // building the scaffold
 
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Student Classes'),
-              backgroundColor: Colors.blue,
-            ),
-            drawer: MyNavigationDrawer(allCourses: allCourses, isTeacher: false, auth: auth, user: user,),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Enter class code'),
-                      content: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            courseCode = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Enter Class code',
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            database.joinCourse(courseCode);
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Submit'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              backgroundColor: Colors.blue,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: const Icon(Icons.add),
-            ),
-            body: AllCoursesList(allCourses: allCourses, isTeacher: false),
+          return StudentHomePageScaffold(
+            auth: auth,
+            user: user,
+            database: database,
+            allCourses: allCourses
           );
         }
       },
+    );
+  }
+}
+
+class StudentHomePageScaffold extends StatefulWidget {
+  final FirebaseAuth auth;
+  final User user; 
+  final Database database;
+  final List<Course> allCourses;
+
+  const StudentHomePageScaffold({super.key, required this.auth, required this.user, required this.database, required this.allCourses});
+
+  @override
+  State<StudentHomePageScaffold> createState() => _StudentHomePageScaffoldState();
+}
+
+class _StudentHomePageScaffoldState extends State<StudentHomePageScaffold> {
+  @override
+  Widget build (BuildContext context) {
+    String courseCode = "";
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Student Classes'),
+        backgroundColor: Colors.blue,
+      ),
+      drawer: MyNavigationDrawer(allCourses: widget.allCourses, isTeacher: false, auth: widget.auth, user: widget.user, database: widget.database, currentPage: "Classes",),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Enter class code'),
+                content: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      courseCode = value;
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Enter Class code',
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      widget.database.joinCourse(courseCode);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: const Icon(Icons.add),
+      ),
+      body: AllCoursesList(allCourses: widget.allCourses, isTeacher: false, database: widget.database,),
     );
   }
 }
