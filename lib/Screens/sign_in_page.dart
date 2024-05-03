@@ -24,7 +24,6 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _auth.authStateChanges().listen((event) {
       setState(() {
@@ -36,7 +35,6 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     if (_user != null) {
-      print(_user);
       return StreamBuilder(
           stream: FirebaseFirestore.instance.collection('Users').snapshots(),
           builder: (context, snapshots){
@@ -75,7 +73,6 @@ class _SignInPageState extends State<SignInPage> {
             }
           });
     } else {
-      print("Hello");
       userIsRegistered = false;
       return Scaffold(
         appBar: AppBar(
@@ -88,7 +85,6 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Widget _googleSignInButton(){
-    // print("Hello");
     return Center(
       child: SizedBox(
         height: 45,
@@ -102,13 +98,27 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _handleGoogleSignIn(){
-    print("Hellow");
     try{
-      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
-      _auth.signInWithProvider(_googleAuthProvider);
+      GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
+      _auth.signInWithProvider(googleAuthProvider);
     } catch(error){
-      print("Error in Google Sign In:");
-      print(error);
+      showDialog(
+        context: context,
+        builder: (context){
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('An error occurred while signing in with Google. Please try again later.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: (){
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        }
+      );
     }
   }
 }
