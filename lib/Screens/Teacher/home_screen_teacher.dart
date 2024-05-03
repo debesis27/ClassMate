@@ -16,51 +16,6 @@ class TeacherHomePage extends StatefulWidget {
 }
 
 class _TeacherHomePage extends State<TeacherHomePage> {
-  // List<Course> allCourses = [
-  //   Course(
-  //     courseCode: 'MA517',
-  //     courseTitle: 'Distributed Algorithms',
-  //     academicYear: '2023-24',
-  //     instructor: 'Kaushik Mondal',
-  //     image: 'assets/mathematics.jpg',
-  //   ),
-  //   Course(
-  //     courseCode: 'MA302',
-  //     courseTitle: 'Optimization Techniques',
-  //     academicYear: '2023-24',
-  //     instructor: 'Arti Pandey',
-  //     image: 'assets/physics.jpg',
-  //   ),
-  //   Course(
-  //     courseCode: 'HS301',
-  //     courseTitle: 'Operation Management',
-  //     academicYear: '2023-24',
-  //     instructor: 'Ravi Kumar',
-  //     image: 'assets/chemistry.jpg',
-  //   ),
-  //   Course(
-  //     courseCode: 'CS503',
-  //     courseTitle: 'Machine Learning',
-  //     academicYear: '2023-24',
-  //     instructor: 'Shashi Shekhar Jha',
-  //     image: 'assets/biology.jpg',
-  //   ),
-  //   Course(
-  //     courseCode: 'CS204',
-  //     courseTitle: 'Computer Architecture',
-  //     academicYear: '2023-24',
-  //     instructor: 'Neeraj Goel',
-  //     image: 'assets/history.jpg',
-  //   ),
-  //   Course(
-  //     courseCode: 'CP301',
-  //     courseTitle: 'DEP',
-  //     academicYear: '2023-24',
-  //     instructor: 'Arti Pandey',
-  //     image: 'assets/english.jpg',
-  //   ),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     final FirebaseAuth auth = widget.auth;

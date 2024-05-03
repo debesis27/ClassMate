@@ -1,6 +1,7 @@
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Screens/Student/home_screen_student.dart';
 import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
+import 'package:ClassMate/Screens/account_page.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -159,21 +160,33 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
           ListTile(
             title: const Text('Account'),
             onTap: () {
-              widget.currentPage == "Account" ? Navigator.pop(context) : Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user)));
+              widget.currentPage == "Account" 
+              ? Navigator.pop(context)
+              : {
+                Navigator.pop(context),
+                Navigator.pop(context),
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user, allCourses: widget.allCourses,)))
+              };
             },
           ),
           ListTile(
             title: const Text('Classes'),
             onTap: () {
-              widget.currentPage == "Classes" ? Navigator.pop(context) : Navigator.push(context, MaterialPageRoute(builder: (context) => homePage));
+              widget.currentPage == "Classes"
+              ? Navigator.pop(context)
+              : {
+                Navigator.pop(context),
+                Navigator.pop(context),
+                Navigator.push(context, MaterialPageRoute(builder: (context) => homePage)),
+              };
             },
           ),
-          ListTile(
-            title: const Text('Tasks'),
-            onTap: () {
-              // Handle Tasks button tap
-            },
-          ),
+          // ListTile(
+          //   title: const Text('Tasks'),
+          //   onTap: () {
+          //     // Handle Tasks button tap
+          //   },
+          // ),
           const Divider(),
           const ListTile(
             title: Text(
@@ -205,87 +218,3 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     );
   }
 }
-
-
-class AccountPage extends StatefulWidget {
-  final FirebaseAuth auth;
-  final User user;
-  const AccountPage({super.key, required this.auth, required this.user});
-
-  @override
-  State<AccountPage> createState() => _AccountPageState();
-}
-
-class _AccountPageState extends State<AccountPage> {
-  @override
-  Widget build(BuildContext context) {
-    final FirebaseAuth auth = widget.auth;
-    final User user = widget.user;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Account', style: TextStyle(fontSize: 24),),
-        backgroundColor: Colors.orange,
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: MaterialButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              color: Colors.redAccent,
-              child: const Text('Log Out', style: TextStyle(fontSize: 18, color: Colors.yellow),),
-              onPressed: (){
-                auth.signOut();
-                Navigator.pop(context, true);
-              }),
-          )
-        ],
-      ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                clipBehavior: Clip.antiAlias,
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(image: NetworkImage(user.photoURL!), fit: BoxFit.cover),
-                  )),
-            ),
-            Text(
-              user.displayName ?? "--",
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
-            ),
-            Text(
-              user.email!,
-              style: const TextStyle(
-                fontSize: 20,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: const RoundedRectangleBorder(),
-                    elevation: 10,
-                    backgroundColor: Colors.red
-                  ),
-                  onPressed: (){
-                    Database(user: user).deleteUser();
-                    auth.signOut();
-                    Navigator.pop(context, true);
-                  },
-                  child: const Text('Delete Account', style: TextStyle(fontSize: 18, color: Colors.white),)),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
