@@ -25,15 +25,15 @@ class _StudentHomePage extends State<StudentHomePage> {
       future: database.getUserCourses(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          //TODO: Add skeletal loading screen
-          return CircularProgressIndicator(); // Show a loading spinner while waiting
+          return SkeletonHomeScreen(
+            auth: widget.auth,
+            user: widget.user,
+            database: database,
+          );
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}'); // Show error if there is any
+          return Text('Error: ${snapshot.error}');
         } else {
           List<Course> allCourses = snapshot.data;
-          
-          // building the scaffold
-
           return StudentHomePageScaffold(
             auth: auth,
             user: user,

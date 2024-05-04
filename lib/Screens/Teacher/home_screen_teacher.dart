@@ -1,3 +1,4 @@
+import 'package:ClassMate/Datasource/dummy_courses_list.dart';
 import 'package:ClassMate/Screens/Teacher/add_new_course.dart';
 import 'package:ClassMate/Screens/common_screen_widgets.dart';
 import 'package:ClassMate/services/database.dart';
@@ -20,57 +21,83 @@ class TeacherHomePage extends StatefulWidget {
 class _TeacherHomePage extends State<TeacherHomePage> {
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth auth = widget.auth;
-    final User user = widget.user;
-    Database database = Database(user: user);
+    Database database = Database(user: widget.user);
+    List<Course> allCourses = dummyCourses;
 
     return FutureBuilder(
       future: database.getUserCourses(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Show a loading spinner while waiting
+          return SkeletonHomeScreen(
+            auth: widget.auth,
+            user: widget.user,
+            database: database,
+          );
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}'); // Show error if there is any
-        } else {
-          List<Course> allCourses = snapshot.data;
-          
-          // building the scaffold
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Teacher Classes'),
-              backgroundColor: Colors.blue,
-            ),
-            drawer: MyNavigationDrawer(
-              allCourses: allCourses,
-              isTeacher: true,
-              auth: auth,
-              user: user,
-              database: database,
-              currentPage: "Classes",
-            ),
-            body: AllCoursesList(
-              allCourses: allCourses,
-              isTeacher: true,
-              database: database,
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddNewCourse(user: user)
-                  ),
-                );
-              },
-              backgroundColor: Colors.blue,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: const Icon(Icons.add),
-            ),
+          return Text('Error: ${snapshot.error}');
+        }else{
+          allCourses = snapshot.data;
+          return TeacherHomeScreenScaffold(
+            allCourses: allCourses,
+            auth: widget.auth,
+            user: widget.user,
+            database: database,
           );
         }
-      },
+      }
+    );
+  }
+}
+
+class TeacherHomeScreenScaffold extends StatelessWidget {
+  const TeacherHomeScreenScaffold({
+    super.key,
+    required this.allCourses,
+    required this.auth,
+    required this.user,
+    required this.database,
+  });
+
+  final List<Course> allCourses;
+  final FirebaseAuth auth;
+  final User user;
+  final Database database;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Classes'),
+        backgroundColor: Colors.blue,
+      ),
+      drawer: MyNavigationDrawer(
+        allCourses: allCourses,
+        isTeacher: true,
+        auth: auth,
+        user: user,
+        database: database,
+        currentPage: "Classes",
+      ),
+      body: AllCoursesList(
+        allCourses: allCourses,
+        isTeacher: true,
+        database: database,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddNewCourse(user: user)
+            ),
+          );
+        },
+        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

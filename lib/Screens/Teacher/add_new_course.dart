@@ -26,13 +26,13 @@ class _AddNewCourseState extends State<AddNewCourse> {
     final List<String> teachingCoursesId = database.teachingCoursesId;
 
     String courseId = await Database(user: user).addCourse(Course(
-        courseTitle: courseTitle,
-        courseCode: courseCode,
-        instructorName: user.displayName ?? "",
-        academicYear: academicYear,
-        instructorUid: user.uid,
-        image: selectedImageIndex.toString(),
-        ));
+      courseTitle: courseTitle,
+      courseCode: courseCode,
+      instructorName: user.displayName ?? "",
+      academicYear: academicYear,
+      instructorUid: user.uid,
+      image: selectedImageIndex.toString(),
+    ));
     teachingCoursesId.add(courseId);
     Database(user: user).updateTeacherCourses(teachingCoursesId);
   }
@@ -154,7 +154,16 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 ),
               ],
             ),
-            //TODO: Add image upload
+            const SizedBox(height: 10),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Select Image',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             SizedBox(
               height: 120,
               child: ListView.builder(
@@ -210,32 +219,40 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                saveInputs(user);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  saveInputs(user);
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  minimumSize: const Size(double.infinity, 48.0),
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.purple,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                minimumSize: const Size(double.infinity, 48.0),
+                child: const Text('Save'),
               ),
-              child: const Text('Save'),
             ),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: OutlinedButton.styleFrom(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: OutlinedButton.styleFrom(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  minimumSize: const Size(double.infinity, 48.0),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                minimumSize: const Size(double.infinity, 48.0),
+                child: const Text('Cancel'),
               ),
-              child: const Text('Cancel'),
             )
           ],
         ),

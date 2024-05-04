@@ -6,6 +6,7 @@ import 'package:ClassMate/Screens/common_utils.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'Student/course_details_student.dart';
 import 'Teacher/course_details_teacher.dart';
 import '../Datasource/images_data.dart';
@@ -38,8 +39,14 @@ class AllCoursesList extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => isTeacher
-                      ? TeacherCourseDetailScreen(course: course, database: database,)
-                      : StudentCourseDetailScreen(course: course, database: database,),
+                        ? TeacherCourseDetailScreen(
+                            course: course,
+                            database: database,
+                          )
+                        : StudentCourseDetailScreen(
+                            course: course,
+                            database: database,
+                          ),
                   ),
                 );
               },
@@ -94,8 +101,7 @@ class AllCoursesList extends StatelessWidget {
                   ),
                 ],
               ),
-            )
-        );
+            ));
       },
     );
   }
@@ -129,13 +135,19 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     Widget homePage;
     final FirebaseAuth auth = widget.auth;
     final User user = widget.user;
-    
-    if(widget.isTeacher) {
-      homePage = TeacherHomePage(auth: auth, user: user,);
+
+    if (widget.isTeacher) {
+      homePage = TeacherHomePage(
+        auth: auth,
+        user: user,
+      );
     } else {
-      homePage = StudentHomePage(auth: auth, user: user,);
+      homePage = StudentHomePage(
+        auth: auth,
+        user: user,
+      );
     }
-    
+
     return Drawer(
       child: ListView(
         children: [
@@ -162,25 +174,33 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
           ListTile(
             title: const Text('Account'),
             onTap: () {
-              widget.currentPage == "Account" 
-              ? Navigator.pop(context)
-              : {
-                Navigator.pop(context),
-                Navigator.pop(context),
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage(auth: auth, user: user, allCourses: widget.allCourses, isTeacher: widget.isTeacher)))
-              };
+              widget.currentPage == "Account"
+                  ? Navigator.pop(context)
+                  : {
+                      Navigator.pop(context),
+                      Navigator.pop(context),
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AccountPage(
+                                  auth: auth,
+                                  user: user,
+                                  allCourses: widget.allCourses,
+                                  isTeacher: widget.isTeacher)))
+                    };
             },
           ),
           ListTile(
             title: const Text('Classes'),
             onTap: () {
               widget.currentPage == "Classes"
-              ? Navigator.pop(context)
-              : {
-                Navigator.pop(context),
-                Navigator.pop(context),
-                Navigator.push(context, MaterialPageRoute(builder: (context) => homePage)),
-              };
+                  ? Navigator.pop(context)
+                  : {
+                      Navigator.pop(context),
+                      Navigator.pop(context),
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => homePage)),
+                    };
             },
           ),
           // ListTile(
@@ -207,8 +227,10 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => widget.isTeacher
-                        ? TeacherCourseDetailScreen(course: course, database: widget.database)
-                        : StudentCourseDetailScreen(course: course, database: widget.database),
+                          ? TeacherCourseDetailScreen(
+                              course: course, database: widget.database)
+                          : StudentCourseDetailScreen(
+                              course: course, database: widget.database),
                     ),
                   );
                 },
@@ -216,6 +238,88 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
             }).toList(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SkeletonHomeScreen extends StatelessWidget {
+  final FirebaseAuth auth;
+  final User user;
+  final Database database;
+
+  const SkeletonHomeScreen({super.key, required this.auth, required this.user, required this.database});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Classes'),
+        backgroundColor: Colors.blue,
+      ),
+      drawer: MyNavigationDrawer(
+        allCourses: const [],
+        isTeacher: true,
+        auth: auth,
+        user: user,
+        database: database,
+        currentPage: "Classes",
+      ),
+      body: skeletonCards(),
+    );
+  }
+
+  Skeletonizer skeletonCards() {
+    return Skeletonizer(
+      enabled: true,
+      child: ListView.builder(
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return Card(
+            elevation: 4,
+            margin: const EdgeInsets.all(8),
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            child: Stack(
+              children: [
+                Container(
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                  ),
+                ),
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 200,
+                        height: 20,
+                        color: Colors.grey[300],
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: 100,
+                        height: 16,
+                        color: Colors.grey[300],
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  child: Container(
+                    width: 100,
+                    height: 16,
+                    color: Colors.grey[300],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

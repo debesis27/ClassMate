@@ -42,6 +42,7 @@ dependencies:
   get:
   permission_handler: ^11.3.0
   sign_in_button: ^3.2.0
+  skeletonizer: ^1.1.2+1
   
 
 dev_dependencies:
