@@ -1,6 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-// import 'dart:convert';
+
+Future<List<String>> scanDevices({required int timeout}) async {
+  
+  List<ScanResult> _scanResults = [];
+
+  await FlutterBluePlus.startScan(timeout: Duration(seconds: timeout));
+
+  // Listening to scan results
+  var subscription = FlutterBluePlus.scanResults.listen((devices) {
+    for (ScanResult device in devices) {
+      int existingIndex = _scanResults.indexWhere((element) =>
+          element.device.remoteId == device.device.remoteId);
+
+      if (existingIndex >= 0) {
+        _scanResults[existingIndex] = device;
+      } else {
+        _scanResults.add(device);
+      }
+    }
+  });
+
+  // Stop scan after timeout
+  await Future.delayed(Duration(seconds: timeout + 1));
+  // await FlutterBluePlus.stopScan();
+  subscription.cancel(); // Stop listening to scan results
+
+  // Process the results after scanning is completed
+  List<String> ids = [];
+  for (ScanResult device in _scanResults) {
+    if (device.advertisementData.serviceData.isNotEmpty) {
+      for (var entry in device.advertisementData.serviceData.entries) {
+        if (entry.key.toString() == "0000") {
+          ids.add(String.fromCharCodes(entry.value));
+        }
+      }
+    }
+  }
+  print(ids.toString());
+  return ids;
+}
 
 class Ble_Body extends StatelessWidget {
   const Ble_Body({super.key});

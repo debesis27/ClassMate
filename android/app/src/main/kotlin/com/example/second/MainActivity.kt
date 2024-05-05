@@ -25,7 +25,8 @@ class MainActivity: FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "startAdvertising") {
-                startAdvertising()
+                val id = call.argument<String>("id") ?: "defaultId"
+                startAdvertising(id)
                 result.success(null)
             } else {
                 result.notImplemented()
@@ -34,7 +35,7 @@ class MainActivity: FlutterActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun startAdvertising() {
+    private fun startAdvertising(id: String) {
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val bluetoothAdapter = bluetoothManager.adapter
         if (!bluetoothAdapter.isEnabled) {
@@ -58,7 +59,7 @@ class MainActivity: FlutterActivity() {
             .setIncludeDeviceName(false)
             .setIncludeTxPowerLevel(false)
             .addServiceUuid(ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB")) // replace with your service UUID
-            .addServiceData(ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB"), "2021mcb1181".toByteArray(Charset.forName("UTF-8"))) // replace with your service UUID and message
+            .addServiceData(ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB"), id.toByteArray(Charset.forName("UTF-8"))) // use the passed ID
             .build()
 
         advertiser.startAdvertising(settings, data, object : AdvertiseCallback() {
@@ -82,5 +83,3 @@ class MainActivity: FlutterActivity() {
         })
     }
 }
-
-
