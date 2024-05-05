@@ -104,6 +104,7 @@ class Database {
           academicYear: doc['Academic Year'],
           instructorUid: doc['Instructor Uid'],
           image: doc['image'],
+          courseReferenceId: doc.id
         ));
       }
     });
@@ -127,6 +128,7 @@ class Database {
           academicYear: courseDoc['Academic Year'],
           instructorUid: courseDoc['Instructor Uid'],
           image: courseDoc['image'],
+          courseReferenceId: courseId
         ));
       }
       this.teachingCoursesId = teachingCoursesId;
@@ -144,6 +146,7 @@ class Database {
           academicYear: courseDoc['Academic Year'],
           instructorUid: courseDoc['Instructor Uid'],
           image: courseDoc['image'],
+          courseReferenceId: courseId
         ));
       }
       this.studyingCoursesId = studyingCoursesId;
@@ -171,8 +174,16 @@ class Database {
   }
 
   // User leaves a course
-  void leaveCourse(String courseId) async {
-    // TODO: Add functionality
+  void studentLeaveCourse(String courseId) async {
+    final userDocumentSnapshot = await usersCollection.doc(user.uid).get();
+    if(userDocumentSnapshot.exists) {
+      final userData = userDocumentSnapshot.data() as Map<String, dynamic>;
+      List<String> studyingCoursesId = userData['studyingCoursesId'].cast<String>();
+      studyingCoursesId.remove(courseId);
+      return updateStudentCourses(studyingCoursesId);
+    }
+
+    //TODO remove student name and uid from corresponding course document
   }
 
   // Add student to a course
