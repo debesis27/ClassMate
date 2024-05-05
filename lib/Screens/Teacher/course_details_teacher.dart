@@ -284,7 +284,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Course Id'),
-                      content: Text(courseId),
+                      content: Text(widget.course.courseReferenceId),
                       actions: [
                         TextButton(
                           onPressed: () {

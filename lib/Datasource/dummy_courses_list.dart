@@ -8,6 +8,7 @@ List<Course> dummyCourses = [
     instructorName: 'Kaushik Mondal',
     instructorUid: "--",
     image: 'assets/mathematics.jpg',
+    courseReferenceId: 'asdfljak',
   ),
   Course(
     courseCode: 'MA302',
@@ -16,6 +17,7 @@ List<Course> dummyCourses = [
     instructorName: 'Arti Pandey',
     instructorUid: "--",
     image: 'assets/physics.jpg',
+    courseReferenceId: 'asdfljak',
   ),
   Course(
     courseCode: 'HS301',
@@ -24,6 +26,7 @@ List<Course> dummyCourses = [
     instructorName: 'Ravi Kumar',
     instructorUid: "--",
     image: 'assets/chemistry.jpg',
+    courseReferenceId: 'asdfljak',
   ),
   Course(
     courseCode: 'CS503',
@@ -32,6 +35,7 @@ List<Course> dummyCourses = [
     instructorName: 'Shashi Shekhar Jha',
     instructorUid: "--",
     image: 'assets/biology.jpg',
+    courseReferenceId: 'asdfljak',
   ),
   Course(
     courseCode: 'CS204',
@@ -40,5 +44,6 @@ List<Course> dummyCourses = [
     instructorName: 'Neeraj Goel',
     instructorUid: "--",
     image: 'assets/history.jpg',
+    courseReferenceId: 'asdfljak',
   ),
 ];

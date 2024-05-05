@@ -34,7 +34,7 @@ class StudentCourseDetailScreen extends StatelessWidget {
               child: Text('Stats for ${course.courseCode}'),
             ),
             Center(
-              child: CourseSettings(database: database),
+              child: CourseSettings(database: database, course: course,),
             )
           ],
         ),
@@ -45,8 +45,8 @@ class StudentCourseDetailScreen extends StatelessWidget {
 
 class CourseSettings extends StatefulWidget {
   final Database database;
-
-  const CourseSettings({super.key, required this.database});
+  final Course course;
+  const CourseSettings({super.key, required this.database, required this.course});
 
   @override
   State<CourseSettings> createState() => _CourseSettingsState();
@@ -55,7 +55,6 @@ class CourseSettings extends StatefulWidget {
 class _CourseSettingsState extends State<CourseSettings> {
   @override
   Widget build(BuildContext context) {
-    String courseId = "Yo";
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -72,7 +71,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: const Text('Course Id'),
-                        content: Text(courseId),
+                        content: Text(widget.course.courseReferenceId),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -104,7 +103,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                         actions: [
                           TextButton(
                             onPressed: () async {
-                              widget.database.leaveCourse(courseId);
+                              widget.database.studentLeaveCourse(widget.course.courseReferenceId);
                               Navigator.of(context).pop();
                             },
                             child: const Text('Leave'),

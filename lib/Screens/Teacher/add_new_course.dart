@@ -32,6 +32,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
       academicYear: academicYear,
       instructorUid: user.uid,
       image: selectedImageIndex.toString(),
+      courseReferenceId: ""
     ));
     teachingCoursesId.add(courseId);
     Database(user: user).updateTeacherCourses(teachingCoursesId);
