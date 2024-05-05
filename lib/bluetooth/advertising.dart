@@ -1,7 +1,7 @@
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
 
-Future<void> startAdvertising() async {
+Future<void> startAdvertising({required String id}) async {
 
   const platform = MethodChannel('com.example.ClassMate/advertise');
 
@@ -11,7 +11,7 @@ Future<void> startAdvertising() async {
       status = await Permission.bluetoothAdvertise.request();
     }
     if (status.isGranted) {
-      await platform.invokeMethod('startAdvertising');
+      await platform.invokeMethod('startAdvertising', <String, dynamic>{'id': id});
     } else {
       print("Bluetooth advertising permission not granted");
     }
