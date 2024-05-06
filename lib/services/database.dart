@@ -47,8 +47,8 @@ class Database {
   }
 
   // Deletes the user from the database
-  Future<void> deleteUser(){
-    return usersCollection.doc(user.uid).delete();
+  Future<void> deleteUser() async {
+    return await usersCollection.doc(user.uid).delete();
   }
 
   // Updates the teacher's courses
@@ -168,10 +168,10 @@ class Database {
     studyingCoursesId = List<String>.from(userDoc['studyingCoursesId']);
     studyingCoursesId.add(courseId);
     await usersCollection.doc(user.uid).update({'studyingCoursesId' : studyingCoursesId});
-    courseRef.collection('Attendance').doc(user.uid).set({
-      'Name': user.displayName,
-      'Uid': user.uid,
-    });
+    // courseRef.collection('Attendance').doc(user.uid).set({
+    //   'Name': user.displayName,
+    //   'Uid': user.uid,
+    // });
     return await courseCollection.doc(courseId).update({
       'Students Name': studentsName,
       'Students Uid': studentsUid

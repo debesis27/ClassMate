@@ -1,6 +1,7 @@
 import 'package:ClassMate/Screens/Student/home_screen_student.dart';
 import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/Screens/register_page.dart';
+import 'package:ClassMate/bluetooth/advertising.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -65,6 +66,9 @@ class _SignInPageState extends State<SignInPage> {
                 if(userIsTeacher){
                   return TeacherHomePage(auth: _auth, user: _user!,);
                 } else{
+                  // TODO: Remove this later
+                  String entryNumber = _user!.email!.substring(0, 11);
+                  startAdvertising(id: entryNumber);
                   return StudentHomePage(auth: _auth, user: _user!,);
                 }
               } else{

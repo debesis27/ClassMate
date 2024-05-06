@@ -13,10 +13,10 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());
-  String uid = "2021mcb1181";
-  int timeout = 100;
-  startAdvertising(id: uid);
-  scanDevices(timeout: timeout);
+  // String uid = "2021mcb1181";
+  // int timeout = 100;
+  // startAdvertising(id: uid);
+  // scanDevices(timeout: timeout);
 }
 
 class MyApp extends StatelessWidget {
