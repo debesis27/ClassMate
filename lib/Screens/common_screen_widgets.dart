@@ -178,7 +178,6 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                   ? Navigator.pop(context)
                   : {
                       Navigator.pop(context),
-                      Navigator.pop(context),
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -248,7 +247,11 @@ class SkeletonHomeScreen extends StatelessWidget {
   final User user;
   final Database database;
 
-  const SkeletonHomeScreen({super.key, required this.auth, required this.user, required this.database});
+  const SkeletonHomeScreen(
+      {super.key,
+      required this.auth,
+      required this.user,
+      required this.database});
 
   @override
   Widget build(BuildContext context) {

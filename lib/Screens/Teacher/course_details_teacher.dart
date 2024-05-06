@@ -266,7 +266,6 @@ class CourseSettings extends StatefulWidget {
 class _CourseSettingsState extends State<CourseSettings> {
   @override
   Widget build(BuildContext context) {
-    String courseId = "Yo";
     String studentId = "";
 
     return Column(
@@ -277,8 +276,6 @@ class _CourseSettingsState extends State<CourseSettings> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ElevatedButton(
               onPressed: () {
-                widget.database.getCourseId(widget.course.courseCode, widget.course.academicYear, widget.course.instructorUid);
-                // TODO: Implement show course code functionality
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -401,7 +398,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                       actions: [
                         TextButton(
                           onPressed: () async {
-                            widget.database.deleteCourse(courseId);
+                            widget.database.deleteCourse(widget.course.courseReferenceId);
                             Navigator.of(context).pop();
                           },
                           child: const Text('Delete'),

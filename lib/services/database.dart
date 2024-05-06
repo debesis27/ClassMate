@@ -80,8 +80,7 @@ class Database {
 
   // Deletes a course from the database
   void deleteCourse(String courseId) async {
-    // TODO: Check if this works
-    await courseCollection.doc(courseId).delete();
+    //TODO: Delete course from the database
   }
 
   // Adds a user to a course
@@ -196,9 +195,9 @@ class Database {
     //TODO: add functionality
   }
 
-  // Gets Course Id
-  Future<String> getCourseId(String courseCode, String academicYear, String instructorUid) async {
-    QuerySnapshot querySnapshot = await courseCollection.where('Code', isEqualTo: courseCode).where('Academic Year', isEqualTo: academicYear).where('Instructor Uid', isEqualTo: instructorUid).get();
-    return querySnapshot.docs[0].id;
-  }
+  // // Gets Course Id
+  // Future<String> getCourseId(String courseCode, String academicYear, String instructorUid) async {
+  //   QuerySnapshot querySnapshot = await courseCollection.where('Code', isEqualTo: courseCode).where('Academic Year', isEqualTo: academicYear).where('Instructor Uid', isEqualTo: instructorUid).get();
+  //   return querySnapshot.docs[0].id;
+  // }
 }
