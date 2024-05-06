@@ -10,6 +10,19 @@ class Database {
   final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
   final CollectionReference courseCollection = FirebaseFirestore.instance.collection('Courses');
 
+  Future<int> isRegistered() async {
+    // return 0 if the user is not registered, 1 if the user is a teacher, 2 if the user is a student
+    DocumentSnapshot doc1 = await usersCollection.doc(user.uid).get();
+    DocumentSnapshot doc2 = await usersCollection.doc(user.email!.substring(0, 11)).get();
+    int Teacher = 0;
+    if (doc1.exists) {
+      Teacher = 1;
+    } else if (doc2.exists) {
+      Teacher = 2;
+    }
+    return Teacher;
+  }
+
   // Checks if the user is a teacher
   Future<bool> isTeacher() async {
     final User user = this.user;

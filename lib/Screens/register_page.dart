@@ -1,93 +1,98 @@
+import 'package:ClassMate/Screens/Student/home_screen_student.dart';
+import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatefulWidget {
-  final FirebaseAuth auth;
+class ChoisePage extends StatefulWidget {
   final User user;
-  const RegisterPage({super.key, required this.auth, required this.user});
-
+  final FirebaseAuth auth;
+  final Database database;
+  const ChoisePage({super.key, required this.user, required this.auth, required this.database});
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<ChoisePage> createState() => _ChoisePageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _ChoisePageState extends State<ChoisePage> {
+  bool isTeacher = false;
+  bool isStudent = false;
+
   @override
   Widget build(BuildContext context) {
-    final User user = widget.user;
-
+    if (isTeacher) {
+      return TeacherHomePage(auth: widget.auth, user: widget.user);
+    }
+    if (isStudent) {
+      return StudentHomePage(auth: widget.auth, user: widget.user);
+    }
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'ZooP',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: Colors.blue,
+        title: Text('Choose Your Role'),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
       ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
+      body: Center(
         child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                      image: DecorationImage(image: NetworkImage(user.photoURL!), fit: BoxFit.cover))),
-            ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
             Text(
-              user.displayName ?? "--",
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
-            ),
-            Text(
-              user.email!,
-              style: const TextStyle(
-                fontSize: 20,
+              'Select Your Role',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 100.0),
-              child: Text(
-                'Register on ZooP as- ',
-                style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.brown,
-                    fontWeight: FontWeight.w600),
-              ),
+            SizedBox(height: 30),
+            ChoiceButton(
+              label: 'Teacher',
+              onPressed: () {
+                // Navigate to Teacher Page or perform other actions
+                widget.database.setTeachersCollection();
+                setState(() {
+                  isTeacher = true;
+                });
+              },
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-                  child: OutlinedButton(
-                      onPressed: () {
-                        Database(user: user).setTeachersCollection();
-                      },
-                      child: const Text(
-                        'Teacher',
-                        style: TextStyle(fontSize: 21),
-                      )),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-                  child: OutlinedButton(
-                      onPressed: () {
-                        Database(user: user).setStudentsCollection();
-                      },
-                      child: const Text(
-                        'Student',
-                        style: TextStyle(fontSize: 21),
-                      )),
-                )
-              ],
-            )
+            SizedBox(height: 20),
+            ChoiceButton(
+              label: 'Student',
+              onPressed: () {
+                // Navigate to Student Page or perform other actions
+                widget.database.setStudentsCollection();
+                setState(() {
+                  isStudent = true;
+                });
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+
+class ChoiceButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const ChoiceButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.deepPurple, // Button color
+        foregroundColor: Colors.white, // Text color
+        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        textStyle: TextStyle(fontSize: 18),
       ),
     );
   }
