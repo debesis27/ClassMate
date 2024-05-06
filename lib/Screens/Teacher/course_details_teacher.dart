@@ -1,6 +1,7 @@
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Student {
   final String name;
@@ -27,7 +28,8 @@ class TeacherCourseDetailScreen extends StatefulWidget {
   final Course course;
   final Database database;
 
-  const TeacherCourseDetailScreen({super.key, required this.course, required this.database});
+  const TeacherCourseDetailScreen(
+      {super.key, required this.course, required this.database});
 
   @override
   State<TeacherCourseDetailScreen> createState() =>
@@ -92,19 +94,20 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.course.courseCode),
-          backgroundColor: Colors.blue,
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Attendance'),
-              Tab(text: 'Stats'),
-              Tab(text: 'Settings'),
-            ],
-          ),
-        ),
+            title: Text(widget.course.courseCode),
+            backgroundColor: Colors.blue,
+            bottom: const TabBar(
+              tabs: [
+                Tab(text: 'Attendance'),
+                Tab(text: 'Students'),
+              ],
+            ),
+            actions: [
+              CourseSettings(course: widget.course, database: widget.database)
+            ]),
         body: TabBarView(
           children: [
             Center(
@@ -114,9 +117,6 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
             ),
             Center(
               child: AttendanceStats(allStudents: students),
-            ),
-            Center(
-              child: CourseSettings(course: widget.course, database: widget.database,),
             ),
           ],
         ),
@@ -137,7 +137,29 @@ class TakeAttendance extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () {
             //TODO: Add function to take attendance
-            onPressed();
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: const Text(
+                        'Are you sure you want to take today\'s attendance?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          onPressed();
+                        },
+                        child: const Text('Yes'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                    ],
+                  );
+                });
           },
           child: const Text('Take Attendance'),
         ));
@@ -174,7 +196,13 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text("Today's Attendance: $todaysTotalAttendance"),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "Total Attendance: $todaysTotalAttendance",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: widget.allStudents.length,
@@ -257,7 +285,8 @@ class CourseSettings extends StatefulWidget {
   final Course course;
   final Database database;
 
-  const CourseSettings({super.key, required this.course, required this.database});
+  const CourseSettings(
+      {super.key, required this.course, required this.database});
 
   @override
   State<CourseSettings> createState() => _CourseSettingsState();
@@ -268,155 +297,166 @@ class _CourseSettingsState extends State<CourseSettings> {
   Widget build(BuildContext context) {
     String studentId = "";
 
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Course Id'),
-                      content: Text(widget.course.courseReferenceId),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Ok'),
-                        ),
-                      ]
-                    );
-                  }
-                );
-              },
-              child: const Text('Show Course Code'),
-            ),
-          ),
+    Future<dynamic> showCourseId(BuildContext context) {
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: const Text(
+                  'Course Id',
+                  style: TextStyle(fontSize: 26),
+                ),
+                content: Row(
+                  children: [
+                    Text(
+                      widget.course.courseReferenceId,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(
+                            text: widget.course.courseReferenceId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Copied to clipboard'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Ok'),
+                  ),
+                ]);
+          });
+    }
+
+    Future<dynamic> addStudent(BuildContext context, String studentId) {
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: const Text('Add Student'),
+                content: TextField(onChanged: (value) {
+                  setState(() {
+                    studentId = value;
+                  });
+                }),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      widget.database.addStudentToCourse(studentId);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Add'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  )
+                ]);
+          });
+    }
+
+    Future<dynamic> removeStudent(BuildContext context, String studentId) {
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: const Text('Remove Student'),
+                content: TextField(onChanged: (value) {
+                  setState(() {
+                    studentId = value;
+                  });
+                }),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      widget.database.removeStudentFromCourse(studentId);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Remove'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  )
+                ]);
+          });
+    }
+
+    Future<dynamic> deleteCourse(BuildContext context) {
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: const Text('Delete Course'),
+                content:
+                    const Text('Are you sure you want to delete this course'),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      widget.database
+                          .deleteCourse(widget.course.courseReferenceId);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Delete'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  )
+                ]);
+          });
+    }
+
+    return PopupMenuButton<String>(
+      onSelected: (value) => {
+        if (value == 'show-course-id')
+          {showCourseId(context)}
+        else if (value == 'add-student')
+          {addStudent(context, studentId)}
+        else if (value == 'remove-student')
+          {removeStudent(context, studentId)}
+        else if (value == 'delete-course')
+          {deleteCourse(context)}
+        else
+          {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Invalid Option'),
+              ),
+            )
+          }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        const PopupMenuItem<String>(
+          value: 'show-course-id',
+          child: Text('Show Course Id'),
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement add student functionality
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Add Student'),
-                      content: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            studentId = value;
-                          });
-                        }
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            widget.database.addStudentToCourse(studentId);
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Add'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Cancel'),
-                        )
-                      ]
-                    );
-                  }
-                );
-              },
-              child: const Text('Add Student'),
-            ),
-          ),
+        const PopupMenuItem<String>(
+          value: 'add-student',
+          child: Text('Add Student'),
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement remove student functionality
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Remove Student'),
-                      content: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            studentId = value;
-                          });
-                        }
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            widget.database.removeStudentFromCourse(studentId);
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Remove'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Cancel'),
-                        )
-                      ]
-                    );
-                  }
-                );
-              },
-              child: const Text('Remove Student'),
-            ),
-          ),
+        const PopupMenuItem<String>(
+          value: 'remove-student',
+          child: Text('Remove Student'),
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement delete course functionality
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Delete Course'),
-                      content: const Text('Are you sure you want to delete this course'),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            widget.database.deleteCourse(widget.course.courseReferenceId);
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Delete'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Cancel'),
-                        )
-                      ]
-                    );
-                  }
-                );
-              },
-              child: const Text('Delete Course'),
-            ),
-          ),
+        const PopupMenuItem<String>(
+          value: 'delete-course',
+          child: Text('Delete Course'),
         ),
       ],
     );
