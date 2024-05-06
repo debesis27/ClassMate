@@ -20,12 +20,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
   int selectedImageIndex = 0;
 
   void saveInputs(user) async {
-    Database database = Database(user: user);
-    //TODO: Use below thing to avoid duplication of classes
-    await database.getUserCourses();
-    final List<String> teachingCoursesId = database.teachingCoursesId;
-
-    String courseId = await Database(user: user).addCourse(Course(
+    await Database(user: user).addCourse(Course(
       courseTitle: courseTitle,
       courseCode: courseCode,
       instructorName: user.displayName ?? "",
@@ -34,8 +29,6 @@ class _AddNewCourseState extends State<AddNewCourse> {
       image: selectedImageIndex.toString(),
       courseReferenceId: ""
     ));
-    teachingCoursesId.add(courseId);
-    Database(user: user).updateTeacherCourses(teachingCoursesId);
   }
 
   @override

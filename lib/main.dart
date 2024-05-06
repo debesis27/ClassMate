@@ -14,7 +14,7 @@ Future<void> main() async {
   );
   runApp(const MyApp());
   String uid = "2021mcb1181";
-  int timeout = 100;
+  int timeout = 10;
   startAdvertising(id: uid);
   scanDevices(timeout: timeout);
 }

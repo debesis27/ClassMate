@@ -49,20 +49,12 @@ class Database {
   // Deletes the user from the database
   Future<void> deleteUser(){
     return usersCollection.doc(user.uid).delete();
+    // TODO Remove user's courses from the course collection
   }
 
-  // Updates the teacher's courses
-  void updateTeacherCourses(List<String> coursesIdList) async{
-    return await usersCollection.doc(user.uid).update({'teachingCoursesId' : coursesIdList});
-  }
-
-  // Updates the student's courses
-  void updateStudentCourses(List<String> courseIdList) async{
-    return await usersCollection.doc(user.uid).update({'studyingCoursesId' : courseIdList});
-  }
-
-  // Adds a new course to the database
-  Future<String> addCourse(Course course) async{
+  // Adds a course to the courseCollection
+  // Updates the teachingCoursesId attribute at firestore database
+  Future<void> addCourse(Course course) async{
     DocumentReference courseRef =  await courseCollection.add({
       'Title': course.courseTitle,
       'Code': course.courseCode,
@@ -74,22 +66,20 @@ class Database {
       'Attendance list': [],
       'image': course.image
     });
+
     String courseId = courseRef.id;
-    return courseId;
+    List<String> teachingCoursesId = [];
+    DocumentSnapshot userDoc = await usersCollection.doc(user.uid).get();
+    teachingCoursesId = List<String>.from(userDoc['teachingCoursesId']);
+    teachingCoursesId.add(courseId);
+    return await usersCollection.doc(user.uid).update({'teachingCoursesId' : teachingCoursesId});
+    //TODO when creating a course and pressing save, at the teacher_home_screen, the course is not showing immediately
   }
 
   // Deletes a course from the database
   void deleteCourse(String courseId) async {
-    // TODO: Check if this works
+    // TODO: delete this course's info from the user's collection 
     await courseCollection.doc(courseId).delete();
-  }
-
-  // Adds a user to a course
-  void addUserToCourse({required String courseId, required List<String> studentsNameList, required List<String> studentsUidList}) async{
-    return await courseCollection.doc(courseId).update({
-      'Students Name': studentsNameList,
-      'Students Uid': studentsUidList
-    });
   }
 
   // Retrieves all courses from the database
@@ -155,7 +145,8 @@ class Database {
     return courses;
   }
 
-  // Joins a user to a course
+  // Update the studyingCoursesId of the student at the Firestore database
+  // Adds the user info to the Course at the courseCollection
   Future<void> joinCourse(String courseId) async {
     DocumentSnapshot doc = await courseCollection.doc(courseId).get();
     List<String> studentsName = List<String>.from(doc['Students Name']);
@@ -167,11 +158,12 @@ class Database {
     studyingCoursesId = List<String>.from(userDoc['studyingCoursesId']);
     studyingCoursesId.add(courseId);
     await usersCollection.doc(user.uid).update({'studyingCoursesId' : studyingCoursesId});
+
     return await courseCollection.doc(courseId).update({
       'Students Name': studentsName,
       'Students Uid': studentsUid
     });
-  }
+  }//TODO when joining a course and pressing save, at the student_home_screen, the course is not showing immediately
 
   // User leaves a course
   void studentLeaveCourse(String courseId) async {
@@ -180,9 +172,8 @@ class Database {
       final userData = userDocumentSnapshot.data() as Map<String, dynamic>;
       List<String> studyingCoursesId = userData['studyingCoursesId'].cast<String>();
       studyingCoursesId.remove(courseId);
-      return updateStudentCourses(studyingCoursesId);
+      await usersCollection.doc(user.uid).update({'studyingCoursesId' : studyingCoursesId});
     }
-
     //TODO remove student name and uid from corresponding course document
   }
 
