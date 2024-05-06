@@ -10,16 +10,23 @@ Future<Map<String, dynamic>> markAttendance(String courseId, String sessionId, {
   // Get the list of all students in the course
   DocumentSnapshot courseDoc = await FirebaseFirestore.instance.collection('Courses').doc(courseId).get();
   List<String> allStudesnts = List<String>.from(courseDoc['Students Uid']);
-
-  // Prepare the attendance data: each student ID will have a corresponding value of 'true', plus include the date and time
-  Map<String, dynamic> attendanceData = {
-    'date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-    'time': DateFormat('HH:mm:ss').format(DateTime.now())
-  };
-  for (String studentId in allStudesnts) {
-    attendanceData[studentId] = false;
+  
+  // reading the current data that is present in the session
+  DocumentSnapshot sessionDoc = await courseAttendanceReference.doc(sessionId).get();
+  Map<String, dynamic> attendanceData = {};
+  if (sessionDoc.exists) {
+    attendanceData = sessionDoc.data() as Map<String, dynamic>;
+    attendanceData['date'] = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    attendanceData['time'] = DateFormat('HH:mm:ss').format(DateTime.now());
+  } else {
+    // Initialize the attendance data with all students absent
+    attendanceData['date'] = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    attendanceData['time'] = DateFormat('HH:mm:ss').format(DateTime.now());
+    for (String studentId in allStudesnts) {
+      attendanceData[studentId] = false;
+    }
   }
-
+  
   // Mark the students present
   List<String> studentsToMarkPresent = await scanDevices(timeout: timeout);
   for (String studentId in studentsToMarkPresent) {

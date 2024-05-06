@@ -50,7 +50,7 @@ class _SignInPageState extends State<SignInPage> {
             } else{
               List<DocumentSnapshot<Object?>> userDocuments = snapshots.data!.docs;
               for(int i = 0; i < userDocuments.length; i++){
-                if(userDocuments[i].id == _user!.uid){
+                if(userDocuments[i].id == _user!.uid || userDocuments[i].id == _user!.email!.substring(0, 11)){
                   userIsRegistered = true;
                   userIsTeacher = userDocuments[i]['isTeacher'];
                   if(userIsTeacher){
