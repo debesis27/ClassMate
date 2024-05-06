@@ -37,7 +37,7 @@ Future<List<String>> scanDevices({required int timeout}) async {
       }
     }
   }
-  print(ids.toString());
+  // print(ids.toString());
   return ids;
 }
 

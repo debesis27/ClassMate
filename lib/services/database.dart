@@ -84,32 +84,33 @@ class Database {
     await courseCollection.doc(courseId).delete();
   }
 
-  // Adds a user to a course
-  void addUserToCourse({required String courseId, required List<String> studentsNameList, required List<String> studentsUidList}) async{
-    return await courseCollection.doc(courseId).update({
-      'Students Name': studentsNameList,
-      'Students Uid': studentsUidList
-    });
-  }
+  // this function is used to get the course details from the database
+  // // Adds a user to a course
+  // void addUserToCourse({required String courseId, required List<String> studentsNameList, required List<String> studentsUidList}) async{
+  //   return await courseCollection.doc(courseId).update({
+  //     'Students Name': studentsNameList,
+  //     'Students Uid': studentsUidList
+  //   });
+  // }
 
-  // Retrieves all courses from the database
-  List<Course> getAllCourses(){
-    List<Course> courses = [];
-    courseCollection.get().then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        courses.add(Course(
-          courseTitle: doc['Title'],
-          courseCode: doc['Code'],
-          instructorName: doc['Instructor Name'],
-          academicYear: doc['Academic Year'],
-          instructorUid: doc['Instructor Uid'],
-          image: doc['image'],
-          courseReferenceId: doc.id
-        ));
-      }
-    });
-    return courses;  
-  }
+  // // Retrieves all courses from the database
+  // List<Course> getAllCourses(){
+  //   List<Course> courses = [];
+  //   courseCollection.get().then((QuerySnapshot querySnapshot) {
+  //     for (var doc in querySnapshot.docs) {
+  //       courses.add(Course(
+  //         courseTitle: doc['Title'],
+  //         courseCode: doc['Code'],
+  //         instructorName: doc['Instructor Name'],
+  //         academicYear: doc['Academic Year'],
+  //         instructorUid: doc['Instructor Uid'],
+  //         image: doc['image'],
+  //         courseReferenceId: doc.id
+  //       ));
+  //     }
+  //   });
+  //   return courses;  
+  // }
 
   // Retrieves the courses of the current user
   Future<List<Course>> getUserCourses() async {
@@ -157,6 +158,7 @@ class Database {
 
   // Joins a user to a course
   Future<void> joinCourse(String courseId) async {
+    DocumentReference courseRef = courseCollection.doc(courseId);
     DocumentSnapshot doc = await courseCollection.doc(courseId).get();
     List<String> studentsName = List<String>.from(doc['Students Name']);
     List<String> studentsUid = List<String>.from(doc['Students Uid']);
@@ -167,6 +169,10 @@ class Database {
     studyingCoursesId = List<String>.from(userDoc['studyingCoursesId']);
     studyingCoursesId.add(courseId);
     await usersCollection.doc(user.uid).update({'studyingCoursesId' : studyingCoursesId});
+    courseRef.collection('Attendance').doc(user.uid).set({
+      'Name': user.displayName,
+      'Uid': user.uid,
+    });
     return await courseCollection.doc(courseId).update({
       'Students Name': studentsName,
       'Students Uid': studentsUid
@@ -186,12 +192,12 @@ class Database {
     //TODO remove student name and uid from corresponding course document
   }
 
-  // Add student to a course
+  // Add student to a course manually by teacher
   Future<void> addStudentToCourse(String studentEntryNumber) async {
     //TODO: Add student to a course
   }
 
-  // Remove student from a course
+  // Remove student from a course manually by teacher
   Future<void> removeStudentFromCourse(String studentEntryNumber) async {
     //TODO: add functionality
   }
