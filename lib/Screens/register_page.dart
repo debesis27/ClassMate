@@ -14,7 +14,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
-    final FirebaseAuth auth = widget.auth;
     final User user = widget.user;
 
     return Scaffold(
@@ -49,21 +48,6 @@ class _RegisterPageState extends State<RegisterPage> {
               style: const TextStyle(
                 fontSize: 20,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: ElevatedButton(
-                  onPressed: () {
-                    auth.signOut();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    elevation: 4
-                  ),
-                  child: const Text(
-                    'Sign Out',
-                    style: TextStyle(fontSize: 20, color: Colors.yellow),
-                  )),
             ),
             const Padding(
               padding: EdgeInsets.only(top: 100.0),
