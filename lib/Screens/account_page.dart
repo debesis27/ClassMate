@@ -8,6 +8,7 @@ import 'package:ClassMate/services/database.dart';
 class AccountPage extends StatefulWidget {
   final FirebaseAuth auth;
   final User user;
+  final Database database;
   final List<Course> allCourses;
   final bool isTeacher;
 
@@ -15,6 +16,7 @@ class AccountPage extends StatefulWidget {
       {super.key,
       required this.auth,
       required this.user,
+      required this.database,
       required this.allCourses,
       required this.isTeacher});
 
@@ -48,7 +50,7 @@ class _AccountPageState extends State<AccountPage> {
             AccountPersonalInfo(user: widget.user),
             const SizedBox(height: 15),
             AccountLogoutCard(auth: widget.auth, context: context),
-            AccountDeleteCard(auth: widget.auth, context: context),
+            AccountDeleteCard(auth: widget.auth, database: widget.database ,context: context),
           ],
         )
     );
@@ -91,7 +93,7 @@ class AccountCard extends StatelessWidget {
                 children: [
                   Text(
                     user.displayName == null || user.displayName!.trim().isEmpty
-                        ? "Shivam Maske"
+                        ? "--"
                         : user.displayName!,
                     style: const TextStyle(
                         fontSize: 22, fontWeight: FontWeight.w500),
@@ -211,6 +213,7 @@ class AccountLogoutCard extends StatelessWidget {
                     auth.signOut();
                     Navigator.pop(context, true);
                     Navigator.pop(context, true);
+                    Navigator.pop(context, true);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -248,9 +251,10 @@ class AccountLogoutCard extends StatelessWidget {
 
 class AccountDeleteCard extends StatelessWidget {
   final FirebaseAuth auth;
+  final Database database;
   final BuildContext context;
 
-  const AccountDeleteCard({super.key, required this.auth, required this.context});
+  const AccountDeleteCard({super.key, required this.auth, required this.database, required this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +276,9 @@ class AccountDeleteCard extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    database.deleteUser();
                     auth.signOut();
+                    Navigator.pop(context, true);
                     Navigator.pop(context, true);
                     Navigator.push(
                         context,

@@ -185,7 +185,8 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                                   auth: auth,
                                   user: user,
                                   allCourses: widget.allCourses,
-                                  isTeacher: widget.isTeacher)))
+                                  isTeacher: widget.isTeacher,
+                                  database: widget.database)))
                     };
             },
           ),
