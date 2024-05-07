@@ -33,6 +33,7 @@ Future<List<String>> scanDevices({required int timeout}) async {
       for (var entry in device.advertisementData.serviceData.entries) {
         if (entry.key.toString() == "0000") {
           ids.add(String.fromCharCodes(entry.value));
+          print("Device found: ${device.device.platformName} (${device.device.remoteId}) with ID: ${String.fromCharCodes(entry.value)}");
         }
       }
     }
