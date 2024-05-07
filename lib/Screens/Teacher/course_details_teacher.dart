@@ -29,9 +29,10 @@ class Student {
 class TeacherCourseDetailScreen extends StatefulWidget {
   final Course course;
   final Database database;
+  final Function onUpdate;
 
   const TeacherCourseDetailScreen(
-      {super.key, required this.course, required this.database});
+      {super.key, required this.course, required this.database, required this.onUpdate});
 
   @override
   State<TeacherCourseDetailScreen> createState() =>
@@ -122,7 +123,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
               ],
             ),
             actions: [
-              CourseSettings(course: widget.course, database: widget.database)
+              CourseSettings(course: widget.course, database: widget.database, onUpdate: widget.onUpdate)
             ]),
         body: TabBarView(
           children: [
@@ -353,9 +354,10 @@ class AttendanceStats extends StatelessWidget {
 class CourseSettings extends StatefulWidget {
   final Course course;
   final Database database;
+  final Function onUpdate;
 
   const CourseSettings(
-      {super.key, required this.course, required this.database});
+      {super.key, required this.course, required this.database, required this.onUpdate});
 
   @override
   State<CourseSettings> createState() => _CourseSettingsState();
@@ -379,7 +381,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                   children: [
                     Text(
                       widget.course.courseReferenceId,
-                      style: const TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 15),
                     ),
                     IconButton(
                       icon: const Icon(Icons.copy),
@@ -412,7 +414,11 @@ class _CourseSettingsState extends State<CourseSettings> {
           builder: (BuildContext context) {
             return AlertDialog(
                 title: const Text('Add Student'),
-                content: TextField(onChanged: (value) {
+                content: TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Enter Lowercase Entry no. '
+                  ),
+                  onChanged: (value) {
                   setState(() {
                     studentId = value;
                   });
@@ -420,7 +426,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      widget.database.addStudentToCourse(studentId);
+                      await widget.database.addStudentToCourse(studentId, widget.course.courseReferenceId);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Add'),
@@ -441,7 +447,11 @@ class _CourseSettingsState extends State<CourseSettings> {
           builder: (BuildContext context) {
             return AlertDialog(
                 title: const Text('Remove Student'),
-                content: TextField(onChanged: (value) {
+                content: TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Enter Lowercase Entry no. '
+                  ),
+                  onChanged: (value) {
                   setState(() {
                     studentId = value;
                   });
@@ -449,7 +459,7 @@ class _CourseSettingsState extends State<CourseSettings> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      widget.database.removeStudentFromCourse(studentId);
+                      await widget.database.removeStudentFromCourse(studentId, widget.course.courseReferenceId);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Remove'),
@@ -475,9 +485,10 @@ class _CourseSettingsState extends State<CourseSettings> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      widget.database
-                          .deleteCourse(widget.course.courseReferenceId);
+                      await widget.database.deleteCourse(widget.course.courseReferenceId);
                       Navigator.of(context).pop();
+                      Navigator.pop(context, true);
+                      await widget.onUpdate();
                     },
                     child: const Text('Delete'),
                   ),

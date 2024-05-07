@@ -11,6 +11,7 @@ class AccountPage extends StatefulWidget {
   final Database database;
   final List<Course> allCourses;
   final bool isTeacher;
+  final Function onUpdate;
 
   const AccountPage({
     super.key,
@@ -19,6 +20,7 @@ class AccountPage extends StatefulWidget {
     required this.database,
     required this.allCourses,
     required this.isTeacher,
+    required this.onUpdate
   });
 
   @override
@@ -43,6 +45,7 @@ class _AccountPageState extends State<AccountPage> {
         database: Database(user: widget.user),
         allCourses: widget.allCourses,
         currentPage: "Account",
+        onUpdate: widget.onUpdate,
       ),
       body: SingleChildScrollView(
         child: Column(
