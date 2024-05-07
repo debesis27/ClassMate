@@ -23,6 +23,26 @@ class Database {
     return Teacher;
   }
 
+  Future<void> updateUserNameInDatabase(String newName) async{
+    DocumentSnapshot doc1 = await usersCollection.doc(user.uid).get();
+    DocumentSnapshot doc2 = await usersCollection.doc(user.email!.substring(0, 11)).get();
+    if(doc1.exists){
+      await usersCollection.doc(user.uid).update({
+        'Name': newName
+      });
+      List<String> teachingCoursesId = List<String>.from(doc1['teachingCoursesId']);
+      for (String courseId in teachingCoursesId){
+        await courseCollection.doc(courseId).update({
+          'Instructor Name' : newName
+        });
+      }
+    } else if(doc2.exists){
+      await usersCollection.doc(user.email!.substring(0, 11)).update({
+        'Name': newName
+      });
+    }
+  }
+
   // Checks if the user is a teacher
   Future<bool> isTeacher() async {
     final User user = this.user;
@@ -63,7 +83,6 @@ class Database {
       'Academic Year': course.academicYear,
       'Instructor Name': course.instructorName,
       'Instructor Uid': course.instructorUid,
-      'Students Name': [],
       'Students Uid': [],
       'image': course.image
     });
@@ -99,7 +118,6 @@ class Database {
       List<String> studyingCoursesId = [];
       DocumentSnapshot doc = await usersCollection.doc(user.email!.substring(0, 11)).get();
       studyingCoursesId = List<String>.from(doc['studyingCoursesId']);
-
       for (String courseId in studyingCoursesId) {
         DocumentSnapshot courseDoc = await courseCollection.doc(courseId).get();
         courses.add(Course(
@@ -119,12 +137,10 @@ class Database {
   // Joins a user to a course and modifies the studyingCoursesId of the student
   Future<void> joinCourse(String courseId) async {
     DocumentSnapshot doc = await courseCollection.doc(courseId).get();
-    List<String> studentsName = List<String>.from(doc['Students Name']);
     List<String> studentsUid = List<String>.from(doc['Students Uid']);
     if (studentsUid.contains(user.email!.substring(0, 11))) {
       return;
     }
-    studentsName.add(user.displayName ?? "");
     studentsUid.add(user.email!.substring(0, 11));
     List<String> studyingCoursesId = [];
     DocumentSnapshot userDoc = await usersCollection.doc(user.email!.substring(0, 11)).get();
@@ -132,7 +148,6 @@ class Database {
     studyingCoursesId.add(courseId);
     await usersCollection.doc(user.email!.substring(0, 11)).update({'studyingCoursesId' : studyingCoursesId});
     return await courseCollection.doc(courseId).update({
-      'Students Name': studentsName,
       'Students Uid': studentsUid
     });
   }
@@ -141,7 +156,6 @@ class Database {
   Future<void> addStudentToCourse(String studentEntryNumber, String courseId) async {
     final courseDocumentSnapshot = await courseCollection.doc(courseId).get();
     final courseData = courseDocumentSnapshot.data() as Map<String, dynamic>;
-    List<String> studentsNameList = courseData['Students Name'].cast<String>();
     List<String> studentsUidList = courseData['Students Uid'].cast<String>();
     if(studentsUidList.contains(studentEntryNumber)){
       return ;
@@ -150,17 +164,14 @@ class Database {
     final studentDocumentSnapshot = await usersCollection.doc(studentEntryNumber).get();
     if(studentDocumentSnapshot.exists){
       final studentData = studentDocumentSnapshot.data() as Map<String, dynamic>;
-      String studentName = studentData['Name'];
       List<String> studyingCoursesId = studentData['studyingCoursesId'].cast<String>();
       studyingCoursesId.add(courseId);
       await usersCollection.doc(studentEntryNumber).update({
         'studyingCoursesId': studyingCoursesId
       }); // updates the studyingCoursesId of the student in usersCollection
 
-      studentsNameList.add(studentName);
       studentsUidList.add(studentEntryNumber);
       await courseCollection.doc(courseId).update({
-        'Students Name': studentsNameList,
         'Students Uid' : studentsUidList
       }); // updates the studentsNameList and studentsUidList in the Course document
     }
@@ -170,7 +181,6 @@ class Database {
   Future<void> removeStudentFromCourse(String studentEntryNumber, String courseId) async {
     final courseDocumentSnapshot = await courseCollection.doc(courseId).get();
     final courseData = courseDocumentSnapshot.data() as Map<String, dynamic>;
-    List<String> studentsNameList = courseData['Students Name'].cast<String>();
     List<String> studentsUidList = courseData['Students Uid'].cast<String>();
     if(!(studentsUidList.contains(studentEntryNumber))){
       return ;
@@ -185,11 +195,8 @@ class Database {
         'studyingCoursesId': studyingCoursesId
       }); // updates the studyingCoursesId of the student in usersCollection
 
-      int studentIndex = studentsUidList.indexOf(studentEntryNumber);
-      studentsUidList.removeAt(studentIndex);
-      studentsNameList.removeAt(studentIndex);
+      studentsUidList.remove(studentEntryNumber);
       await courseCollection.doc(courseId).update({
-        'Students Name': studentsNameList,
         'Students Uid' : studentsUidList
       }); // removes the student's info from Students Name and Students Uid list of Course database
     }
@@ -235,20 +242,16 @@ class Database {
     final courseDocumentSnapshot = await courseCollection.doc(courseId).get();
     if(courseDocumentSnapshot.exists){
       final courseData = courseDocumentSnapshot.data() as Map<String, dynamic>;
-      List<String> studentsNameList = courseData['Students Name'].cast<String>();
       List<String> studentsUidList = courseData['Students Uid'].cast<String>();
 
-      int studentIndex = studentsUidList.indexOf(user.email!.substring(0, 11));
-      studentsUidList.removeAt(studentIndex);
-      studentsNameList.removeAt(studentIndex);
+      studentsUidList.remove(user.email!.substring(0, 11));
       await courseCollection.doc(courseId).update({
-        'Students Name': studentsNameList,
         'Students Uid' : studentsUidList
       }); // removes the student's info from Students Name and Students Uid list of Course database
     }
   }
 
-  // Deletes the user from the database TODO: Modify delete from courses and courses he create
+  // Deletes the user from the database 
   Future<void> deleteUser() async {
     DocumentSnapshot doc1 = await usersCollection.doc(user.uid).get();
     DocumentSnapshot doc2 = await usersCollection.doc(user.email!.substring(0, 11)).get();

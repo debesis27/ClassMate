@@ -1,6 +1,6 @@
 import 'package:ClassMate/Models/course_info_model.dart';
-import 'package:ClassMate/Screens/Student/home_screen_student.dart';
-import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
+// import 'package:ClassMate/Screens/Student/home_screen_student.dart';
+// import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/Screens/account_page.dart';
 import 'package:ClassMate/Screens/common_utils.dart';
 import 'package:ClassMate/services/database.dart';
@@ -139,21 +139,21 @@ class MyNavigationDrawer extends StatefulWidget {
 class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
   @override
   Widget build(BuildContext context) {
-    Widget homePage;
+    // Widget homePage;
     final FirebaseAuth auth = widget.auth;
     final User user = widget.user;
 
-    if (widget.isTeacher) {
-      homePage = TeacherHomePage(
-        auth: auth,
-        user: user,
-      );
-    } else {
-      homePage = StudentHomePage(
-        auth: auth,
-        user: user,
-      );
-    }
+    // if (widget.isTeacher) {
+    //   homePage = TeacherHomePage(
+    //     auth: auth,
+    //     user: user,
+    //   );
+    // } else {
+    //   homePage = StudentHomePage(
+    //     auth: auth,
+    //     user: user,
+    //   );
+    // }
 
     return Drawer(
       child: ListView(
@@ -206,7 +206,6 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                   : {
                       Navigator.pop(context),
                       Navigator.pop(context),
-                      
                     };
             },
           ),

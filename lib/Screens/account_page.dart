@@ -7,16 +7,16 @@ import 'package:ClassMate/Screens/sign_in_page.dart';
 
 class AccountPage extends StatefulWidget {
   final FirebaseAuth auth;
-  final User user;
+  User? user;
   final Database database;
   final List<Course> allCourses;
   final bool isTeacher;
   final Function onUpdate;
 
-  const AccountPage({
+  AccountPage({
     super.key,
     required this.auth,
-    required this.user,
+    this.user,
     required this.database,
     required this.allCourses,
     required this.isTeacher,
@@ -28,6 +28,11 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  void reload(){
+    setState(() {
+      widget.user = FirebaseAuth.instance.currentUser;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,8 +46,8 @@ class _AccountPageState extends State<AccountPage> {
       drawer: MyNavigationDrawer(
         isTeacher: widget.isTeacher,
         auth: widget.auth,
-        user: widget.user,
-        database: Database(user: widget.user),
+        user: widget.user!,
+        database: Database(user: widget.user!),
         allCourses: widget.allCourses,
         currentPage: "Account",
         onUpdate: widget.onUpdate,
@@ -50,9 +55,9 @@ class _AccountPageState extends State<AccountPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            AccountCard(user: widget.user, isTeacher: widget.isTeacher),
+            AccountCard(user: widget.user!, isTeacher: widget.isTeacher),
             const SizedBox(height: 10),
-            AccountPersonalInfo(user: widget.user),
+            AccountPersonalInfo(user: widget.user!, isTeacher: widget.isTeacher, refreshAccountPage: reload),
             const SizedBox(height: 15),
             AccountLogoutCard(auth: widget.auth, context: context),
             AccountDeleteCard(auth: widget.auth, database: widget.database, context: context),
@@ -69,6 +74,7 @@ class AccountCard extends StatelessWidget {
 
   const AccountCard({super.key, required this.user, required this.isTeacher});
 
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -83,28 +89,28 @@ class AccountCard extends StatelessWidget {
         ),
         title: Text(
           user.displayName == null || user.displayName == "" ? '--' : user.displayName!,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          user.email ?? '',
-          style: const TextStyle(fontSize: 16),
-        ),
-        trailing: Text(
-          isTeacher ? "Teacher" : "Student",
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
   }
 }
 
-class AccountPersonalInfo extends StatelessWidget {
+class AccountPersonalInfo extends StatefulWidget {
   final User user;
+  final bool isTeacher;
+  final Function refreshAccountPage;
 
-  const AccountPersonalInfo({super.key, required this.user});
+  const AccountPersonalInfo({super.key, required this.user, required this.isTeacher, required this.refreshAccountPage});
 
   @override
+  State<AccountPersonalInfo> createState() => _AccountPersonalInfoState();
+}
+
+class _AccountPersonalInfoState extends State<AccountPersonalInfo> {
+  @override
   Widget build(BuildContext context) {
+    String newName = '';
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Card(
@@ -121,29 +127,57 @@ class AccountPersonalInfo extends StatelessWidget {
               ),
               const Divider(height: 20, thickness: 1),
               TextButton.icon(
-                icon: const Icon(Icons.camera_alt),
-                label: const Text('Change Profile Picture'),
-                style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
-                onPressed: () {
-                  // TODO: Implement the functionality to change the profile picture
-                },
-              ),
-              const Divider(height: 20, thickness: 1),
-              TextButton.icon(
                 icon: const Icon(Icons.edit),
-                label: const Text('Change Name'),
+                label: const Text('Change Name', style: TextStyle(fontSize: 18),),
                 style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
                 onPressed: () {
-                  // TODO: Implement the functionality to change the name
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('New Name'),
+                        content: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              newName = value;
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Enter New Name',
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () async {
+                              await widget.user.updateDisplayName(newName);
+                              await widget.refreshAccountPage();
+                              await Database(user: widget.user).updateUserNameInDatabase(newName);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Submit'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
               const Divider(height: 20, thickness: 1),
               TextButton.icon(
                 icon: const Icon(Icons.email),
-                label: const Text('Change Email'),
+                label: Text(widget.user.email!, style: const TextStyle(fontSize: 16, color: Colors.grey),),
                 style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
                 onPressed: () {
-                  // TODO: Implement the functionality to change the email
+                  // will do nothing 
+                },
+              ),
+              const Divider(height: 20, thickness: 1),
+              TextButton.icon(
+                icon: const Icon(Icons.supervised_user_circle),
+                label: Text(widget.isTeacher ? "Teacher" : "Student", style: const TextStyle(fontSize: 16, color: Colors.grey),),
+                style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
+                onPressed: () {
+                  // will do nothing
                 },
               ),
             ],
