@@ -1,4 +1,6 @@
+import 'package:ClassMate/Models/session_info.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 Future<String> makeSession(String courseId) async {
   // Reference to the attendance subcollection for the specified course
@@ -9,7 +11,7 @@ Future<String> makeSession(String courseId) async {
   return sessionDoc.id;
 }
 
-Future<List<String>> getSessions(String courseId) async {
+Future<List<Session>> getSessions(String courseId) async {
   // Reference to the attendance subcollection for the specified course
   CollectionReference courseAttendanceReference = FirebaseFirestore.instance.collection('Courses').doc(courseId).collection('Attendance');
 
@@ -19,5 +21,11 @@ Future<List<String>> getSessions(String courseId) async {
       sessionIds.add(doc.id);
     }
   });
-  return sessionIds;
+  List<Session> sessions = [];
+  for (String sessionId in sessionIds) {
+    DocumentSnapshot sessionDoc = await courseAttendanceReference.doc(sessionId).get();
+    DateTime sessionDatetime = DateFormat("yyyy-MM-dd HH:mm:ss").parse(sessionDoc['date'] + " " + sessionDoc['time']);
+    sessions.add(Session(id: sessionId, datetime: sessionDatetime));
+  }
+  return sessions;
 }

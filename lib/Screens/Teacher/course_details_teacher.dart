@@ -2,9 +2,11 @@ import 'package:ClassMate/Marks/CSV.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Models/session_info.dart';
 import 'package:ClassMate/services/database.dart';
+import 'package:ClassMate/services/get_sessions.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class Student {
   final String name;
@@ -43,13 +45,6 @@ class TeacherCourseDetailScreen extends StatefulWidget {
 class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   bool attendanceTaken = false; //TODO: Add function to get attendance status
   String sessionId = "";
-  List<Session> sessions = [
-    Session(date: DateTime.now(), name: 'Session 1', id: '1'),
-    Session(date: DateTime.now(), name: 'Session 2', id: '2'),
-    Session(date: DateTime.now(), name: 'Session 3', id: '3'),
-    Session(date: DateTime.now(), name: 'Session 4', id: '4'),
-    Session(date: DateTime.now(), name: 'Session 5', id: '5'),
-  ];
 
   void setAttendanceTaken() {
     //TODO: Add function to set attendance status
@@ -130,13 +125,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
         body: TabBarView(
           children: [
             Center(
-              // child: attendanceTaken
-              //     ? AttendanceResultOfToday(allStudents: students)
-              //     : TakeAttendance(onPressed: setAttendanceTaken),
-
-              child: sessionId == "" 
-                ? NewSession(setCurrentSessionId: setCurrentSessionId, sessions: sessions)
-                : TakeAttendance(onPressed: setAttendanceTaken,course: widget.course , sessionId: sessionId),
+              child: SessionManager(courseId: widget.course.courseReferenceId),
             ),
             Center(
               child: AttendanceStats(allStudents: students),
@@ -151,93 +140,82 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   }
 }
 
-class NewSession extends StatefulWidget {
-  final Function setCurrentSessionId;
-  final List<Session> sessions;
-
-  const NewSession({super.key, required this.setCurrentSessionId, required this.sessions});
+class SessionManager extends StatefulWidget {
+  final String courseId;
+  const SessionManager({super.key, required this.courseId});
 
   @override
-  State<NewSession> createState() => _NewSessionState();
+  State<SessionManager> createState() => _SessionManagerState();
 }
 
-class _NewSessionState extends State<NewSession> {
+
+class _SessionManagerState extends State<SessionManager> {
+  List<Session> sessions = [];
+  bool isLoading = true;
+
+  Future<void> fetchSessions() async {
+    var sessions = await getSessions(widget.courseId);  // Assume this now returns List<Session>
+    setState(() {
+      this.sessions = sessions;
+      isLoading = false;
+    });
+  }
+
+  Future<void> createSession() async {
+    setState(() {
+      isLoading = true;
+    });
+    await markAttendance(widget.courseId).then((value) {
+      fetchSessions();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSessions();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListTile(
-          title: const Text('Add New Session and Take Attendance'),
-          onTap: () {
-            
-          }
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              createSession();
+            },
+            child: const Text('Add New Session and Take Attendance'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: widget.sessions.length,
-            itemBuilder: (context, index) {
-              return Column(
-                children: [
-                  const Divider(),
-                  ListTile(
-                    title: Text('Session ${index + 1}'),
-                    onTap: () {
-                      widget.setCurrentSessionId(widget.sessions[index].name);
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.separated(
+                  itemCount: sessions.length,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    final session = sessions[index];
+                    return ListTile(
+                      title: Text('Session ${index + 1} - ${DateFormat('yyyy-MM-dd HH:mm').format(session.datetime)}'),
+                      onTap: () {
+                        // Implement your onTap functionality here
+                        // widget.setCurrentSessionId(session.id);
+                      },
+                    );
+                  },
+                ),
         ),
       ],
     );
-  }
-}
-
-class TakeAttendance extends StatelessWidget {
-  final Function onPressed;
-  final Course course;
-  final String sessionId;
-
-  const TakeAttendance({super.key, required this.onPressed, required this.course, required this.sessionId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        alignment: Alignment.center,
-        child: ElevatedButton(
-          onPressed: () {
-            //TODO: Add function to take attendance
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: const Text(
-                        'Are you sure you want to take today\'s attendance?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          // onPressed();
-                          print('Taking attendance for session $sessionId in course ${course.courseReferenceId} Yo mama');
-                          Map<String, dynamic> studentsList = await markAttendance(course.courseReferenceId, sessionId: sessionId);
-                          print(studentsList.toString());
-                        },
-                        child: const Text('Yes'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                    ],
-                  );
-                });
-          },
-          child: const Text('Take Attendance'),
-        ));
   }
 }
 
