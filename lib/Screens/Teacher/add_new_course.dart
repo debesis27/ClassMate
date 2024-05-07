@@ -1,14 +1,16 @@
-// import 'package:ClassMate/Firebase/NewClassFirebase.dart';
-import 'package:ClassMate/Datasource/images_data.dart';
-import 'package:ClassMate/services/database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/services/database.dart';
+import 'package:ClassMate/Datasource/images_data.dart';
 
 class AddNewCourse extends StatefulWidget {
   final User user;
+  final Function onUpdate;
 
-  const AddNewCourse({super.key, required this.user});
+  const AddNewCourse({super.key, required this.user, required this.onUpdate});
+
   @override
   State<AddNewCourse> createState() => _AddNewCourseState();
 }
@@ -19,7 +21,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
   String academicYear = '';
   int selectedImageIndex = 0;
 
-  void saveInputs(user) async {
+  Future<void> saveInputs(User user) async {
     await Database(user: user).addCourse(Course(
       courseTitle: courseTitle,
       courseCode: courseCode,
@@ -33,130 +35,33 @@ class _AddNewCourseState extends State<AddNewCourse> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = widget.user;
-
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue, // Set the background color to blue
+        backgroundColor: theme.primaryColor, // Use theme's primary color
         title: const Text('Add New Course'),
       ),
-      body: Center(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 20.0, bottom: 10.0),
-                    child: const Text(
-                      'Course Code',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10.0),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        courseCode = value;
-                      });
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: const Text(
-                      'Course Title',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10.0),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        courseTitle = value;
-                      });
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: const Text(
-                      'Academic Year',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10.0),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        academicYear = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
+            _buildTextField(
+              label: 'Course Code',
+              onChanged: (value) => setState(() => courseCode = value),
+            ),
+            _buildTextField(
+              label: 'Course Title',
+              onChanged: (value) => setState(() => courseTitle = value),
+            ),
+            _buildTextField(
+              label: 'Academic Year',
+              onChanged: (value) => setState(() => academicYear = value),
             ),
             const SizedBox(height: 10),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Select Image',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            const Text(
+              'Select Image',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(
               height: 120,
@@ -164,93 +69,84 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 scrollDirection: Axis.horizontal,
                 itemCount: images.length,
                 itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedImageIndex = index;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          ColorFiltered(
-                            colorFilter: selectedImageIndex == index
-                                ? const ColorFilter.mode(
-                                    Colors.grey, BlendMode.overlay)
-                                : const ColorFilter.mode(
-                                    Colors.transparent, BlendMode.saturation),
-                            child: Image(
-                              image: images[index].image,
-                              fit: BoxFit.cover,
-                              width: 250,
-                              height: 80,
-                            ),
-                          ),
-                          if (selectedImageIndex == index)
-                            const Positioned(
-                              right: 120,
-                              bottom: 40,
-                              child: Icon(
-                                Icons.circle,
-                                color: Colors.white,
-                              ),
-                            ),
-                          if (selectedImageIndex == index)
-                            const Positioned(
-                              right: 120,
-                              bottom: 40,
-                              child: Icon(
-                                Icons.check_circle,
-                                color: Colors.black,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return _buildImageTile(index);
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  saveInputs(user);
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  minimumSize: const Size(double.infinity, 48.0),
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.purple,
-                ),
-                child: const Text('Save'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: OutlinedButton.styleFrom(
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  minimumSize: const Size(double.infinity, 48.0),
-                ),
-                child: const Text('Cancel'),
-              ),
-            )
+            _buildSaveButton(),
+            _buildCancelButton(),
           ],
         ),
-      )),
+      ),
+    );
+  }
+
+  Widget _buildTextField({required String label, required void Function(String) onChanged}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Enter $label',
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+            ),
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageTile(int index) {
+    bool isSelected = selectedImageIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => selectedImageIndex = index),
+      child: Container(
+        margin: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          border: isSelected ? Border.all(color: Theme.of(context).colorScheme.secondary, width: 2) : null,
+        ),
+        child: Opacity(
+          opacity: isSelected ? 0.5 : 1,
+          child: Image(
+            image: images[index].image,
+            fit: BoxFit.cover,
+            width: 250,
+            height: 80,
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildSaveButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ElevatedButton(
+        onPressed: () async {
+          await saveInputs(widget.user);
+          await widget.onUpdate();
+          Navigator.pop(context);
+        },
+        style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+        child: const Text('Save'),
+      ),
+    );
+  }
+
+  Widget _buildCancelButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: OutlinedButton(
+        onPressed: () => Navigator.pop(context),
+        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+        child: const Text('Cancel'),
+      ),
     );
   }
 }

@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/Screens/common_screen_widgets.dart';
 import 'package:ClassMate/Screens/sign_in_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:ClassMate/services/database.dart';
 
 class AccountPage extends StatefulWidget {
   final FirebaseAuth auth;
@@ -12,13 +12,14 @@ class AccountPage extends StatefulWidget {
   final List<Course> allCourses;
   final bool isTeacher;
 
-  const AccountPage(
-      {super.key,
-      required this.auth,
-      required this.user,
-      required this.database,
-      required this.allCourses,
-      required this.isTeacher});
+  const AccountPage({
+    super.key,
+    required this.auth,
+    required this.user,
+    required this.database,
+    required this.allCourses,
+    required this.isTeacher,
+  });
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -28,31 +29,33 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'My Account',
-            style: TextStyle(fontSize: 24),
-          ),
-          backgroundColor: Colors.blue,
+      appBar: AppBar(
+        title: const Text(
+          'My Account',
+          style: TextStyle(fontSize: 24),
         ),
-        drawer: MyNavigationDrawer(
-          isTeacher: widget.isTeacher,
-          auth: widget.auth,
-          user: widget.user,
-          database: Database(user: widget.user),
-          allCourses: widget.allCourses,
-          currentPage: "Account",
-        ),
-        body: Column(
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
+      drawer: MyNavigationDrawer(
+        isTeacher: widget.isTeacher,
+        auth: widget.auth,
+        user: widget.user,
+        database: Database(user: widget.user),
+        allCourses: widget.allCourses,
+        currentPage: "Account",
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           children: [
             AccountCard(user: widget.user, isTeacher: widget.isTeacher),
             const SizedBox(height: 10),
             AccountPersonalInfo(user: widget.user),
             const SizedBox(height: 15),
             AccountLogoutCard(auth: widget.auth, context: context),
-            AccountDeleteCard(auth: widget.auth, database: widget.database ,context: context),
+            AccountDeleteCard(auth: widget.auth, database: widget.database, context: context),
           ],
-        )
+        ),
+      ),
     );
   }
 }
@@ -65,51 +68,27 @@ class AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 120,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Card(
-          elevation: 3,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Row(children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  clipBehavior: Clip.antiAlias,
-                  height: 70,
-                  width: 70,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: NetworkImage(user.photoURL!), fit: BoxFit.cover),
-                  )),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    user.displayName == null || user.displayName!.trim().isEmpty
-                        ? "--"
-                        : user.displayName!,
-                    style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    user.email!,
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                  Text(
-                    isTeacher ? "Teacher" : "Student",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ]),
+    return Card(
+      margin: const EdgeInsets.all(10),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: ListTile(
+        leading: CircleAvatar(
+          radius: 35,
+          backgroundImage: NetworkImage(user.photoURL ?? ''),
+          backgroundColor: Colors.grey[200],
+        ),
+        title: Text(
+          user.displayName ?? "--",
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          user.email ?? '',
+          style: const TextStyle(fontSize: 16),
+        ),
+        trailing: Text(
+          isTeacher ? "Teacher" : "Student",
+          style: const TextStyle(fontSize: 14, color: Colors.grey),
         ),
       ),
     );
@@ -123,61 +102,45 @@ class AccountPersonalInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Card(
-          elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Personal Information',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap:() {
-                          // TODO: Implement the functionality to change the profile picture
-                        },
-                        child: const Text(
-                          'Change Profile Picture',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      const Divider(height: 26, thickness: 1),
-                      GestureDetector(
-                        onTap: () {
-                          // TODO: Implement the functionality to change the name
-                        },
-                        child: const Text(
-                          'Change Name',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      const Divider(height: 26, thickness: 1),
-                      GestureDetector(
-                        onTap: () {
-                          // TODO: Implement the functionality to change the email
-                        },
-                        child: const Text(
-                          'Change Email',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Personal Information',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+              ),
+              const Divider(height: 20, thickness: 1),
+              TextButton.icon(
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('Change Profile Picture'),
+                onPressed: () {
+                  // TODO: Implement the functionality to change the profile picture
+                },
+              ),
+              const Divider(height: 20, thickness: 1),
+              TextButton.icon(
+                icon: Icon(Icons.edit),
+                label: const Text('Change Name'),
+                onPressed: () {
+                  // TODO: Implement the functionality to change the name
+                },
+              ),
+              const Divider(height: 20, thickness: 1),
+              TextButton.icon(
+                icon: const Icon(Icons.email),
+                label: const Text('Change Email'),
+                onPressed: () {
+                  // TODO: Implement the functionality to change the email
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -226,21 +189,23 @@ class AccountLogoutCard extends StatelessWidget {
           },
         );
       },
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-          child: Card(
-            elevation: 3,
-            // color: const Color.fromARGB(255, 255, 29, 29),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: const Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Text(
-                'Log Out',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-              ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        child: Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.exit_to_app, color: Theme.of(context).primaryColor),
+                const SizedBox(width: 10),
+                const Text(
+                  'Log Out',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
           ),
         ),
@@ -292,21 +257,23 @@ class AccountDeleteCard extends StatelessWidget {
           },
         );
       },
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-          child: Card(
-            elevation: 3,
-            // color: const Color.fromARGB(255, 255, 29, 29),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: const Padding(
-              padding: EdgeInsets.all(15.0),
-              child: Text(
-                'Delete Account',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-              ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        child: Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: const Padding(
+            padding: EdgeInsets.all(15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.delete_forever, color: Colors.red),
+                const SizedBox(width: 10),
+                Text(
+                  'Delete Account',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
           ),
         ),

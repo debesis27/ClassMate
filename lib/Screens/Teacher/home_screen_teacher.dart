@@ -19,6 +19,11 @@ class TeacherHomePage extends StatefulWidget {
 }
 
 class _TeacherHomePage extends State<TeacherHomePage> {
+
+  void update() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     Database database = Database(user: widget.user);
@@ -38,10 +43,11 @@ class _TeacherHomePage extends State<TeacherHomePage> {
         }else{
           allCourses = snapshot.data;
           return TeacherHomeScreenScaffold(
-            allCourses: allCourses,
             auth: widget.auth,
             user: widget.user,
             database: database,
+            allCourses: allCourses,
+            onChanged: update,
           );
         }
       }
@@ -56,12 +62,14 @@ class TeacherHomeScreenScaffold extends StatelessWidget {
     required this.auth,
     required this.user,
     required this.database,
+    required this.onChanged,
   });
 
   final List<Course> allCourses;
   final FirebaseAuth auth;
   final User user;
   final Database database;
+  final Function onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +96,7 @@ class TeacherHomeScreenScaffold extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddNewCourse(user: user)
+              builder: (context) => AddNewCourse(user: user, onUpdate: onChanged)
             ),
           );
         },
