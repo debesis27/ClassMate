@@ -7,9 +7,10 @@ import 'package:flutter/services.dart';
 class StudentCourseDetailScreen extends StatelessWidget {
   final Course course;
   final Database database;
+  final Function onUpdate;
 
   const StudentCourseDetailScreen(
-      {super.key, required this.course, required this.database});
+      {super.key, required this.course, required this.database, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class StudentCourseDetailScreen extends StatelessWidget {
               ],
             ),
             actions: [
-              CourseSettings(course: course, database: database),
+              CourseSettings(course: course, database: database, onUpdate: onUpdate,),
             ]),
         body: TabBarView(
           children: [
@@ -46,9 +47,10 @@ class StudentCourseDetailScreen extends StatelessWidget {
 class CourseSettings extends StatelessWidget {
   final Course course;
   final Database database;
+  final Function onUpdate;
 
   const CourseSettings(
-      {super.key, required this.course, required this.database});
+      {super.key, required this.course, required this.database, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,7 @@ class CourseSettings extends StatelessWidget {
                   children: [
                     Text(
                       course.courseReferenceId,
-                      style: const TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 15),
                     ),
                     IconButton(
                       icon: const Icon(Icons.copy),
@@ -103,9 +105,10 @@ class CourseSettings extends StatelessWidget {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      database.studentLeaveCourse(course.courseReferenceId);
+                      await database.studentLeaveCourse(course.courseReferenceId);
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
+                      await onUpdate();
                     },
                     child: const Text('Leave'),
                   ),

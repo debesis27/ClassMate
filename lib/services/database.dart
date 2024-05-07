@@ -137,19 +137,6 @@ class Database {
     });
   }
 
-  // User leaves a course
-  void studentLeaveCourse(String courseId) async {
-    final userDocumentSnapshot = await usersCollection.doc(user.uid).get();
-    if(userDocumentSnapshot.exists) {
-      final userData = userDocumentSnapshot.data() as Map<String, dynamic>;
-      List<String> studyingCoursesId = userData['studyingCoursesId'].cast<String>();
-      studyingCoursesId.remove(courseId);
-      await usersCollection.doc(user.uid).update({'studyingCoursesId' : studyingCoursesId});
-    }
-
-    //TODO remove student name and uid from corresponding course document
-  }
-
   // Add student to a course manually by teacher
   Future<void> addStudentToCourse(String studentEntryNumber, String courseId) async {
     final courseDocumentSnapshot = await courseCollection.doc(courseId).get();
@@ -233,6 +220,32 @@ class Database {
     }); // removes the courseId from teacher's teachingCoursesId
 
     await courseCollection.doc(courseId).delete(); // deletes the entire course document from the courseCollection
+  }
+
+  // User leaves a course
+  Future<void> studentLeaveCourse(String courseId) async {
+    final userDocumentSnapshot = await usersCollection.doc(user.email!.substring(0, 11)).get();
+    if(userDocumentSnapshot.exists) {
+      final userData = userDocumentSnapshot.data() as Map<String, dynamic>;
+      List<String> studyingCoursesId = userData['studyingCoursesId'].cast<String>();
+      studyingCoursesId.remove(courseId);
+      await usersCollection.doc(user.email!.substring(0, 11)).update({'studyingCoursesId' : studyingCoursesId});
+    } // removes courseId from the user's studying course's id
+
+    final courseDocumentSnapshot = await courseCollection.doc(courseId).get();
+    if(courseDocumentSnapshot.exists){
+      final courseData = courseDocumentSnapshot.data() as Map<String, dynamic>;
+      List<String> studentsNameList = courseData['Students Name'].cast<String>();
+      List<String> studentsUidList = courseData['Students Uid'].cast<String>();
+
+      int studentIndex = studentsUidList.indexOf(user.email!.substring(0, 11));
+      studentsUidList.removeAt(studentIndex);
+      studentsNameList.removeAt(studentIndex);
+      await courseCollection.doc(courseId).update({
+        'Students Name': studentsNameList,
+        'Students Uid' : studentsUidList
+      }); // removes the student's info from Students Name and Students Uid list of Course database
+    }
   }
 
   // Deletes the user from the database TODO: Modify delete from courses and courses he create

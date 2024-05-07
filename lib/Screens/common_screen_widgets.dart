@@ -49,6 +49,7 @@ class AllCoursesList extends StatelessWidget {
                         : StudentCourseDetailScreen(
                             course: course,
                             database: database,
+                            onUpdate: onUpdate,
                           ),
                   ),
                 );
@@ -237,7 +238,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                           ? TeacherCourseDetailScreen(
                               course: course, database: widget.database, onUpdate: widget.onUpdate,)
                           : StudentCourseDetailScreen(
-                              course: course, database: widget.database),
+                              course: course, database: widget.database, onUpdate: widget.onUpdate,),
                     ),
                   );
                 },
