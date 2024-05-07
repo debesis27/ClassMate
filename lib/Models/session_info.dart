@@ -1,7 +1,6 @@
-class Session{
-  final DateTime date;
-  final String name;
+class Session {
   final String id;
+  final DateTime datetime;
 
-  Session({required this.date, required this.name, required this.id});
+  Session({required this.id, required this.datetime});
 }
