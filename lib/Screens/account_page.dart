@@ -79,7 +79,7 @@ class AccountCard extends StatelessWidget {
           backgroundColor: Colors.grey[200],
         ),
         title: Text(
-          user.displayName ?? "--",
+          user.displayName == null || user.displayName == "" ? '--' : user.displayName!,
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
@@ -120,14 +120,16 @@ class AccountPersonalInfo extends StatelessWidget {
               TextButton.icon(
                 icon: const Icon(Icons.camera_alt),
                 label: const Text('Change Profile Picture'),
+                style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
                 onPressed: () {
                   // TODO: Implement the functionality to change the profile picture
                 },
               ),
               const Divider(height: 20, thickness: 1),
               TextButton.icon(
-                icon: Icon(Icons.edit),
+                icon: const Icon(Icons.edit),
                 label: const Text('Change Name'),
+                style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
                 onPressed: () {
                   // TODO: Implement the functionality to change the name
                 },
@@ -136,6 +138,7 @@ class AccountPersonalInfo extends StatelessWidget {
               TextButton.icon(
                 icon: const Icon(Icons.email),
                 label: const Text('Change Email'),
+                style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
                 onPressed: () {
                   // TODO: Implement the functionality to change the email
                 },

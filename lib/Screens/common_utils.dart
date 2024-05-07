@@ -11,3 +11,7 @@ int stringToInt(String s) {
   if(s == '9') return 9;
   return 0;
 }
+
+String todayDate() {
+  return DateTime.now().toString().substring(0, 10);
+}

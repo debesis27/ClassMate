@@ -1,4 +1,5 @@
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/Models/session_info.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,13 @@ class TeacherCourseDetailScreen extends StatefulWidget {
 class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   bool attendanceTaken = false; //TODO: Add function to get attendance status
   String sessionId = "";
+  List<Session> sessions = [
+    Session(date: DateTime.now(), name: 'Session 1', id: '1'),
+    Session(date: DateTime.now(), name: 'Session 2', id: '2'),
+    Session(date: DateTime.now(), name: 'Session 3', id: '3'),
+    Session(date: DateTime.now(), name: 'Session 4', id: '4'),
+    Session(date: DateTime.now(), name: 'Session 5', id: '5'),
+  ];
 
   void setAttendanceTaken() {
     //TODO: Add function to set attendance status
@@ -124,7 +132,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
               //     : TakeAttendance(onPressed: setAttendanceTaken),
 
               child: sessionId == "" 
-                ? NewSession(setCurrentSessionId: setCurrentSessionId)
+                ? NewSession(setCurrentSessionId: setCurrentSessionId, sessions: sessions)
                 : TakeAttendance(onPressed: setAttendanceTaken,course: widget.course , sessionId: sessionId),
             ),
             Center(
@@ -139,8 +147,9 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
 
 class NewSession extends StatefulWidget {
   final Function setCurrentSessionId;
+  final List<Session> sessions;
 
-  NewSession({super.key, required this.setCurrentSessionId});
+  const NewSession({super.key, required this.setCurrentSessionId, required this.sessions});
 
   @override
   State<NewSession> createState() => _NewSessionState();
@@ -149,18 +158,33 @@ class NewSession extends StatefulWidget {
 class _NewSessionState extends State<NewSession> {
   @override
   Widget build(BuildContext context) {
-    List<String> sessionIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-
-    return ListView.builder(
-      itemCount: sessionIds.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text('Session ${index + 1}'),
+    return Column(
+      children: [
+        ListTile(
+          title: const Text('Add New Session and Take Attendance'),
           onTap: () {
-            widget.setCurrentSessionId(sessionIds[index]);
-          },
-        );
-      },
+            
+          }
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: widget.sessions.length,
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  const Divider(),
+                  ListTile(
+                    title: Text('Session ${index + 1}'),
+                    onTap: () {
+                      widget.setCurrentSessionId(widget.sessions[index].name);
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -191,7 +215,7 @@ class TakeAttendance extends StatelessWidget {
                           Navigator.of(context).pop();
                           // onPressed();
                           print('Taking attendance for session $sessionId in course ${course.courseReferenceId} Yo mama');
-                          Map<String, dynamic> studentsList = await markAttendance(course.courseReferenceId, sessionId);
+                          Map<String, dynamic> studentsList = await markAttendance(course.courseReferenceId, sessionId: sessionId);
                           print(studentsList.toString());
                         },
                         child: const Text('Yes'),
