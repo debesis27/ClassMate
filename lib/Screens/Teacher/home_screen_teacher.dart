@@ -37,6 +37,7 @@ class _TeacherHomePage extends State<TeacherHomePage> {
             auth: widget.auth,
             user: widget.user,
             database: database,
+            onUpdate: update,
           );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -85,11 +86,13 @@ class TeacherHomeScreenScaffold extends StatelessWidget {
         user: user,
         database: database,
         currentPage: "Classes",
+        onUpdate: onChanged,
       ),
       body: AllCoursesList(
         allCourses: allCourses,
         isTeacher: true,
         database: database,
+        onUpdate: onChanged
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

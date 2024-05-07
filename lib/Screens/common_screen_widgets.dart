@@ -17,11 +17,13 @@ class AllCoursesList extends StatelessWidget {
     required this.allCourses,
     required this.isTeacher,
     required this.database,
+    required this.onUpdate
   });
 
   final List<Course> allCourses;
   final bool isTeacher;
   final Database database;
+  final Function onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,7 @@ class AllCoursesList extends StatelessWidget {
                         ? TeacherCourseDetailScreen(
                             course: course,
                             database: database,
+                            onUpdate: onUpdate
                           )
                         : StudentCourseDetailScreen(
                             course: course,
@@ -114,6 +117,8 @@ class MyNavigationDrawer extends StatefulWidget {
   final bool isTeacher;
   final List<Course> allCourses;
   final String currentPage;
+  final Function onUpdate;
+
 
   const MyNavigationDrawer({
     super.key,
@@ -123,6 +128,7 @@ class MyNavigationDrawer extends StatefulWidget {
     required this.database,
     required this.allCourses,
     required this.currentPage,
+    required this.onUpdate
   });
 
   @override
@@ -186,7 +192,8 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                                   user: user,
                                   allCourses: widget.allCourses,
                                   isTeacher: widget.isTeacher,
-                                  database: widget.database)))
+                                  database: widget.database,
+                                  onUpdate: widget.onUpdate,)))
                     };
             },
           ),
@@ -228,7 +235,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                     MaterialPageRoute(
                       builder: (context) => widget.isTeacher
                           ? TeacherCourseDetailScreen(
-                              course: course, database: widget.database)
+                              course: course, database: widget.database, onUpdate: widget.onUpdate,)
                           : StudentCourseDetailScreen(
                               course: course, database: widget.database),
                     ),
@@ -247,12 +254,14 @@ class SkeletonHomeScreen extends StatelessWidget {
   final FirebaseAuth auth;
   final User user;
   final Database database;
+  final Function onUpdate;
 
   const SkeletonHomeScreen(
       {super.key,
       required this.auth,
       required this.user,
-      required this.database});
+      required this.database,
+      required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -268,6 +277,7 @@ class SkeletonHomeScreen extends StatelessWidget {
         user: user,
         database: database,
         currentPage: "Classes",
+        onUpdate: onUpdate,
       ),
       body: skeletonCards(),
     );

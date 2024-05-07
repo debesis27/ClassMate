@@ -16,6 +16,11 @@ class StudentHomePage extends StatefulWidget {
 }
 
 class _StudentHomePage extends State<StudentHomePage> {
+  
+  void update() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final FirebaseAuth auth = widget.auth;
@@ -29,6 +34,7 @@ class _StudentHomePage extends State<StudentHomePage> {
             auth: widget.auth,
             user: widget.user,
             database: database,
+            onUpdate: update,
           );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -38,7 +44,8 @@ class _StudentHomePage extends State<StudentHomePage> {
             auth: auth,
             user: user,
             database: database,
-            allCourses: allCourses
+            allCourses: allCourses,
+            onUpdate: update,
           );
         }
       },
@@ -51,8 +58,9 @@ class StudentHomePageScaffold extends StatefulWidget {
   final User user; 
   final Database database;
   final List<Course> allCourses;
+  final Function onUpdate;
 
-  const StudentHomePageScaffold({super.key, required this.auth, required this.user, required this.database, required this.allCourses});
+  const StudentHomePageScaffold({super.key, required this.auth, required this.user, required this.database, required this.allCourses, required this.onUpdate});
 
   @override
   State<StudentHomePageScaffold> createState() => _StudentHomePageScaffoldState();
@@ -68,7 +76,7 @@ class _StudentHomePageScaffoldState extends State<StudentHomePageScaffold> {
         title: const Text('Student Classes'),
         backgroundColor: Colors.blue,
       ),
-      drawer: MyNavigationDrawer(allCourses: widget.allCourses, isTeacher: false, auth: widget.auth, user: widget.user, database: widget.database, currentPage: "Classes",),
+      drawer: MyNavigationDrawer(allCourses: widget.allCourses, isTeacher: false, auth: widget.auth, user: widget.user, database: widget.database, currentPage: "Classes", onUpdate: widget.onUpdate,),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -89,7 +97,8 @@ class _StudentHomePageScaffoldState extends State<StudentHomePageScaffold> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      widget.database.joinCourse(courseCode);
+                      await widget.database.joinCourse(courseCode);
+                      await widget.onUpdate();
                       Navigator.of(context).pop();
                     },
                     child: const Text('Submit'),
@@ -105,7 +114,7 @@ class _StudentHomePageScaffoldState extends State<StudentHomePageScaffold> {
         ),
         child: const Icon(Icons.add),
       ),
-      body: AllCoursesList(allCourses: widget.allCourses, isTeacher: false, database: widget.database,),
+      body: AllCoursesList(allCourses: widget.allCourses, isTeacher: false, database: widget.database, onUpdate: widget.onUpdate),
     );
   }
 }
