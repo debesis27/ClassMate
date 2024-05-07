@@ -1,3 +1,4 @@
+import 'package:ClassMate/Marks/CSV.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Models/session_info.dart';
 import 'package:ClassMate/services/database.dart';
@@ -111,7 +112,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
             title: Text(widget.course.courseCode),
@@ -120,6 +121,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
               tabs: [
                 Tab(text: 'Attendance'),
                 Tab(text: 'Students'),
+                Tab(text: 'Marks Upload (CSV)'),
               ],
             ),
             actions: [
@@ -138,6 +140,9 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
             ),
             Center(
               child: AttendanceStats(allStudents: students),
+            ),
+            Center(
+              child: CSVUploaderWidget(courseId: widget.course.courseReferenceId),
             ),
           ],
         ),
@@ -540,5 +545,52 @@ class _CourseSettingsState extends State<CourseSettings> {
         ),
       ],
     );
+  }
+}
+
+
+
+class CSVUploaderWidget extends StatefulWidget {
+  final String courseId;
+
+  const CSVUploaderWidget({Key? key, required this.courseId}) : super(key: key);
+
+  @override
+  _CSVUploaderWidgetState createState() => _CSVUploaderWidgetState();
+}
+
+class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
+  String _statusMessage = 'Ready to upload CSV';
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ElevatedButton(
+          onPressed: _pickAndUploadCSV,
+          child: Text('Pick and Upload CSV'),
+        ),
+        SizedBox(height: 20),
+        Text(_statusMessage),
+      ],
+    );
+  }
+
+  void _pickAndUploadCSV() async {
+    setState(() {
+      _statusMessage = "Processing...";
+    });
+
+    CSV csv = CSV(courseId: widget.courseId);
+    await csv.pickAndProcessCSV().then((_) {
+      setState(() {
+        _statusMessage = "Upload Successful!";
+      });
+    }).catchError((error) {
+      setState(() {
+        _statusMessage = "Failed to upload: $error";
+      });
+    });
   }
 }
