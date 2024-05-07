@@ -169,7 +169,7 @@ class AccountLogoutCard extends StatelessWidget {
           builder: (context) {
             return AlertDialog(
               title: const Text('Log Out'),
-              content: const Text('Are you sure you want to log out?'),
+              content: const Text('Confirm Log out?'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -236,7 +236,7 @@ class AccountDeleteCard extends StatelessWidget {
           builder: (context) {
             return AlertDialog(
               title: const Text('Delete Account'),
-              content: const Text('Are you sure you want to delete your account?'),
+              content: const Text('Confirm Delete your account?'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -245,10 +245,10 @@ class AccountDeleteCard extends StatelessWidget {
                   child: const Text('Cancel'),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    database.deleteUser();
+                  onPressed: () async{
+                    await database.deleteUser();
                     auth.signOut();
+                    Navigator.pop(context, true);
                     Navigator.pop(context, true);
                     Navigator.pop(context, true);
                     Navigator.push(

@@ -250,7 +250,22 @@ class Database {
 
   // Deletes the user from the database TODO: Modify delete from courses and courses he create
   Future<void> deleteUser() async {
-    return await usersCollection.doc(user.uid).delete();
+    DocumentSnapshot doc1 = await usersCollection.doc(user.uid).get();
+    DocumentSnapshot doc2 = await usersCollection.doc(user.email!.substring(0, 11)).get();
+    
+    if (doc1.exists) { // means user is a teacher
+      List<String> teachingCoursesId = List<String>.from(doc1['teachingCoursesId']);
+      for (String courseId in teachingCoursesId){
+        await deleteCourse(courseId);
+      }  
+      await usersCollection.doc(user.uid).delete();
+    } 
+    else if (doc2.exists) { // means user is a student
+      List<String> studyingCoursesId = List<String>.from(doc2['studyingCoursesId']);
+      for(String courseId in studyingCoursesId){
+        await studentLeaveCourse(courseId);
+      }
+      await usersCollection.doc(user.email!.substring(0, 11)).delete();
+    }
   }
-
 }
