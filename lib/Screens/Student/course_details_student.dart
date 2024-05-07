@@ -1,8 +1,13 @@
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/Models/session_info.dart';
+import 'package:ClassMate/bluetooth/advertising.dart';
 import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:ClassMate/services/database.dart';
+import 'package:ClassMate/services/get_sessions.dart';
+import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class StudentCourseDetailScreen extends StatelessWidget {
   final Course course;
@@ -31,8 +36,8 @@ class StudentCourseDetailScreen extends StatelessWidget {
             ]),
         body: TabBarView(
           children: [
-            const Center(
-              child: Ble_Body(),
+            Center(
+              child: SessionManager(courseId: course.courseReferenceId),
             ),
             Center(
               child: Text('Stats for ${course.courseCode}'),
@@ -43,6 +48,78 @@ class StudentCourseDetailScreen extends StatelessWidget {
     );
   }
 }
+
+
+class SessionManager extends StatefulWidget {
+  final String courseId;
+  const SessionManager({super.key, required this.courseId});
+
+  @override
+  State<SessionManager> createState() => _SessionManagerState();
+}
+
+
+class _SessionManagerState extends State<SessionManager> {
+  List<Session> sessions = [];
+  bool isLoading = true;
+
+  Future<void> fetchSessions() async {
+    var sessions = await getSessions(widget.courseId);  // Assume this now returns List<Session>
+    setState(() {
+      this.sessions = sessions;
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSessions();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              stopAdvertising();
+            },
+            child: const Text('Stop Advertising and Mark Attendance'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.separated(
+                  itemCount: sessions.length,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    final session = sessions[index];
+                    return ListTile(
+                      title: Text('Session ${index + 1} - ${DateFormat('yyyy-MM-dd HH:mm').format(session.datetime)}'),
+                      onTap: () {
+                        // Implement your onTap functionality here
+                        // widget.setCurrentSessionId(session.id);
+                      },
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
 
 class CourseSettings extends StatelessWidget {
   final Course course;

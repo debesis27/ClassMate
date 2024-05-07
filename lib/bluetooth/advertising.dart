@@ -19,3 +19,13 @@ Future<void> startAdvertising({required String id}) async {
     print("Failed to start advertising: '${e.message}'.");
   }
 }
+
+
+Future<void> stopAdvertising() async {
+  const platform = MethodChannel('com.example.ClassMate/advertise');
+  try {
+    await platform.invokeMethod('stopAdvertising');
+  } on PlatformException catch (e) {
+    print("Failed to stop advertising: '${e.message}'.");
+  }
+}
