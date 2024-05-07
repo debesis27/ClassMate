@@ -168,9 +168,9 @@ class _NewSessionState extends State<NewSession> {
 class TakeAttendance extends StatelessWidget {
   final Function onPressed;
   final Course course;
-  String sessionId;
+  final String sessionId;
 
-  TakeAttendance({super.key, required this.onPressed, required this.course, required this.sessionId});
+  const TakeAttendance({super.key, required this.onPressed, required this.course, required this.sessionId});
 
   @override
   Widget build(BuildContext context) {
