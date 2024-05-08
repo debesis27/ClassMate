@@ -8,10 +8,8 @@ import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 class TeacherCourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -31,6 +29,10 @@ class TeacherCourseDetailScreen extends StatefulWidget {
 
 class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
   String sessionId = "";
+
+  void reload () {
+    setState(() {});
+  }
 
   void setCurrentSessionId(String id) {
     setState(() {
@@ -102,6 +104,15 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
               ],
             ),
             actions: [
+              GestureDetector(
+                onTap: () {
+                  reload();
+                },
+                child: const Icon(
+                  Icons.refresh,
+                  size: 28,
+                ),
+              ),
               CourseSettings(
                   course: widget.course,
                   database: widget.database,
