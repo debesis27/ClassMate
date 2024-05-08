@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ClassMate/Screens/common_utils.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,6 +38,7 @@ class CSV {
         for (final row in fields) {
           if (row.isNotEmpty) {
             String documentName = row[0]; // First column is the doc name
+            documentName = removeWhiteSpacesAndLowerCase(documentName); // Remove white spaces and convert to lowercase
             uploadMarksToFirestore(documentName, headers, row);
           }
         }

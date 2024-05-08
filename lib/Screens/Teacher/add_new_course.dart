@@ -73,22 +73,18 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 },
               ),
             ),
-            SizedBox(height: 20),  // Provide space before buttons
-            Row(
+            const SizedBox(height: 20),  // Provide space before buttons
+            Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,  // Use spaceEvenly for better distribution
               children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: _buildSaveButton(),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: _buildSaveButton(),
                 ),
-                // Expanded(
-                //   child: Padding(
-                //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                //     child: _buildCancelButton(),
-                //   ),
-                // ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: _buildCancelButton(),
+                ),
               ],
             ),
           ],
@@ -140,7 +136,6 @@ class _AddNewCourseState extends State<AddNewCourse> {
     );
   }
 
-
   Widget _buildSaveButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -155,7 +150,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
           backgroundColor: Colors.blue, // A more vibrant color
           elevation: 2, // Slight elevation for 3D effect
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12), // Rounded corners
+            borderRadius: BorderRadius.circular(200), // Rounded corners
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Better padding for aesthetics
         ),
@@ -170,7 +165,6 @@ class _AddNewCourseState extends State<AddNewCourse> {
       ),
     );
   }
-
 
   Widget _buildCancelButton() {
     return Padding(

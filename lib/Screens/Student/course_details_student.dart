@@ -275,41 +275,60 @@ class StudentStats extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Quiz Marks',
+                    'Marks',
                     style: TextStyle(
-                      fontSize: 20.0,
+                      fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 15.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: quizMarks.entries.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              entry.key,
+                  ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: quizMarks.length,
+                    itemBuilder: (context, index) {
+                      final entry = quizMarks.entries.toList()[index];
+                      final quizTitle = 'Quiz ${index + 1}';
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (index != 0) // Add a divider before each quiz except the first one
+                            const Divider(),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(
+                              quizTitle,
                               style: const TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            Text(
-                              entry.value,
-                              style: const TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.black87,
+                                fontSize: 20.0,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Your Marks:',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                entry.value,
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       );
-                    }).toList(),
+                    },
                   ),
                 ],
               ),

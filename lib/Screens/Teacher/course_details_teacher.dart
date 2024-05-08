@@ -238,7 +238,9 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
         } else {
           List<Student> allStudents = snapshot.data!;
           String todaysTotalAttendance = findTodaysTotalAttendance(allStudents);
-          return updating ? const CircularProgressIndicator(): Column(
+          return updating
+          ? const CircularProgressIndicator()
+          : Column(
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -253,8 +255,7 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.white, backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0), // Softer rounded corners
                     ),
@@ -262,71 +263,78 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Improved padding for a better tactile feel
                     textStyle: const TextStyle(
                       letterSpacing: 1.2, // Increase letter spacing for a more open look
+                      fontSize: 16, // Slightly larger text for better readability
                     ),
                   ),
                   child: const Text(
                     'Take Attendance',
-                    style: TextStyle(
-                      fontSize: 16, // Slightly larger text for better readability
-                    ),
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Today\'s Attendance: $todaysTotalAttendance',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w300,
+                child: Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: ListTile(
+                    title: const Text(
+                      'Today\'s Attendance',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    trailing: Text(
+                      todaysTotalAttendance,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              Expanded( // This will take all available space
-                child: ListView.builder(
-                  itemCount: allStudents.length,
-                  itemBuilder: (context, index) {
-                    final student = allStudents[index];
-                    return ListTile(
-                      title: Text(student.entryNumber),
-                      leading: student.isPresent
-                          ? const Icon(Icons.check, color: Colors.green)
-                          : const Icon(Icons.close, color: Colors.red),
-                      trailing: PopupMenuButton<String>(
-                        onSelected: (value) {
-                          setState(() async {
-                            if (value == 'mark_present') {
-                              setState(() {
-                                updating = true;
-                              });
-                              await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, true);
-                              setState(() {
-                                updating = false;
-                              });
-                            } else {
-                              setState(() {
-                                updating = true;
-                              });
-                              await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, false);
-                              setState(() {
-                                updating = false;
-                              });
-                            }
-                          });
-                        },
-                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(
-                            value: 'mark_present',
-                            child: Text('Mark Present'),
+              Card(
+                elevation: 2,
+                margin: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: List.generate(
+                    allStudents.length,
+                    (index) {
+                      final student = allStudents[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(student.entryNumber),
+                            leading: Icon(
+                              student.isPresent ? Icons.check : Icons.close,
+                              color: student.isPresent ? Colors.green : Colors.red,
+                            ),
+                            trailing: Switch(
+                              value: student.isPresent,
+                              onChanged: (newValue) async {
+                                setState(() {
+                                  updating = true;
+                                });
+                                await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, newValue);
+                                setState(() {
+                                  updating = false;
+                                });
+                              },
+                              activeColor: Colors.green, // Color when switch is ON
+                              inactiveThumbColor: Colors.red, // Color when switch is OFF
+                              activeTrackColor: Colors.green.withOpacity(0.5), // Color of the track when switch is ON
+                              inactiveTrackColor: Colors.red.withOpacity(0.5), // Color of the track when switch is OFF
+                            ),
                           ),
-                          const PopupMenuItem<String>(
-                            value: 'mark_absent',
-                            child: Text('Mark Absent'),
-                          ),
+                          if (index != allStudents.length - 1) // Add divider between students except for the last one
+                            const Divider(height: 1, thickness: 1),
                         ],
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

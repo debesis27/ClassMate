@@ -15,3 +15,7 @@ int stringToInt(String s) {
 String todayDate() {
   return DateTime.now().toString().substring(0, 10);
 }
+
+String removeWhiteSpacesAndLowerCase(String s) {
+  return s.trim().toLowerCase();
+}
