@@ -236,27 +236,44 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            FadeTransition(
-              opacity: _opacity!,
-              child: ScaleTransition(
-                scale: _scale!,
-                child: const Text(
-                  'Welcome to Zoop',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
+      body: Container(
+        width: MediaQuery.of(context).size.width, // Adjust width
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          children: [
+            Positioned.fill(
+                child: Image.asset(
+                  'assets/SignInBackground.jpg', // Path to your image asset
+                  fit: BoxFit.fill, // Fill the entire space
+                  width: MediaQuery.of(context).size.width, // Adjust width
+                  height: MediaQuery.of(context).size.height,
                 ),
               ),
+            Center(
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FadeTransition(
+                  opacity: _opacity!,
+                  child: ScaleTransition(
+                    scale: _scale!,
+                    child: const Text(
+                      'Welcome to Zoop',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
+                _googleSignInButton(),
+              ],
+                        ),
             ),
-            const SizedBox(height: 50),
-            _googleSignInButton(),
-          ],
+          ]
         ),
       ),
     );

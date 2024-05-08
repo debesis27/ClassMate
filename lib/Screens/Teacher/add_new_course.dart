@@ -38,7 +38,12 @@ class _AddNewCourseState extends State<AddNewCourse> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor, // Ensures use of the theme's primary color
-        title: const Text('Add New Course'),
+        title: const Text(
+          'Create Course',
+          style: TextStyle(
+            fontSize: 25, // Increase font size for better visibility
+            fontWeight: FontWeight.bold, // Added font weight for better readability
+          ),),
         elevation: 4.0,
       ),
       body: SingleChildScrollView(
