@@ -348,9 +348,9 @@ class Database {
         studentStats['Marks'][key] = '$value / ${maxMarks[key]}';
        });
     } else {
-      studentStats['Marks'] = {'No Quiz Marks Available': ''};
+      studentStats['Marks'] = {'No Marks Available': ''};
     }
-    print(studentStats['Marks']);
+    // print(studentStats['Marks']);
     return studentStats;
   }
 

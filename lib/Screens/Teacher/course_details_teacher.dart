@@ -815,7 +815,8 @@ class StudentsAverageStats extends StatelessWidget {
                       color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 15.0),
+                  if(marks.isNotEmpty)
+                    const SizedBox(height: 15.0),
                   ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                     shrinkWrap: true,

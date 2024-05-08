@@ -330,6 +330,18 @@ class StudentStats extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final entry = quizMarks.entries.toList()[index];
                       final quizTitle = quizMarks.keys.toList()[index];
+                      if(quizTitle == 'No Marks Available'){
+                        return Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(
+                              quizTitle,
+                              style: const TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                      }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
