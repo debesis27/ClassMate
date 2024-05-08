@@ -419,7 +419,7 @@ class AttendanceStats extends StatelessWidget {
                 ),
                  if (student.marks.isNotEmpty) // Check if marks are available
                     ListTile(
-                      subtitle: Column(
+                      title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: student.marks.entries.map((entry) {
                           return Text('${entry.key}: ${entry.value}');
@@ -804,7 +804,7 @@ class StudentsAverageStats extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Average Marks',
+                    'Marks Stats',
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
