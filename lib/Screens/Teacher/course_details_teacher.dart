@@ -1,6 +1,8 @@
 import 'package:ClassMate/Marks/CSV.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Models/session_info.dart';
+import 'package:ClassMate/Models/student_model.dart';
+import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
@@ -8,26 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class Student {
-  final String name;
-  final String entryNumber;
-  bool isPresent;
-  int totalAttendance = 0;
 
-  void markPresent() {
-    isPresent = true;
-  }
-
-  void markAbsent() {
-    isPresent = false;
-  }
-
-  Student(
-      {required this.name,
-      required this.entryNumber,
-      this.isPresent = false,
-      this.totalAttendance = 0});
-}
 
 class TeacherCourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -43,15 +26,7 @@ class TeacherCourseDetailScreen extends StatefulWidget {
 }
 
 class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
-  bool attendanceTaken = false; //TODO: Add function to get attendance status
   String sessionId = "";
-
-  void setAttendanceTaken() {
-    //TODO: Add function to set attendance status
-    // setState(() {
-    //   attendanceTaken = true;
-    // });
-  }
 
   void setCurrentSessionId(String id) {
     setState(() {
@@ -110,8 +85,9 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-            title: Text(widget.course.courseCode),
-            backgroundColor: Colors.blue,
+            title: Text(widget.course.courseCode, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            backgroundColor: Theme.of(context).primaryColor,
+            elevation: 4.0,
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'Attendance'),
@@ -125,7 +101,7 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
         body: TabBarView(
           children: [
             Center(
-              child: SessionManager(courseId: widget.course.courseReferenceId),
+              child: sessionId != "" ? AttendanceResultOfToday(sessionId: sessionId, courseId: widget.course.courseReferenceId, database: widget.database) : SessionManager(courseId: widget.course.courseReferenceId, setCurrentSessionId: setCurrentSessionId),
             ),
             Center(
               child: AttendanceStats(allStudents: students),
@@ -142,12 +118,12 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
 
 class SessionManager extends StatefulWidget {
   final String courseId;
-  const SessionManager({super.key, required this.courseId});
+  final Function setCurrentSessionId;
+  const SessionManager({super.key, required this.courseId, required this.setCurrentSessionId});
 
   @override
   State<SessionManager> createState() => _SessionManagerState();
 }
-
 
 class _SessionManagerState extends State<SessionManager> {
   List<Session> sessions = [];
@@ -165,9 +141,8 @@ class _SessionManagerState extends State<SessionManager> {
     setState(() {
       isLoading = true;
     });
-    await markAttendance(widget.courseId).then((value) {
-      fetchSessions();
-    });
+    String sessionId = await markAttendance(widget.courseId);
+    widget.setCurrentSessionId(sessionId);
   }
 
   @override
@@ -183,33 +158,71 @@ class _SessionManagerState extends State<SessionManager> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
-            onPressed: () {
-              createSession();
-            },
-            child: const Text('Add New Session and Take Attendance'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
-          ),
+                  onPressed: () {
+                    createSession();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0), // Softer rounded corners
+                    ),
+                    elevation: 3, // Slightly higher elevation for a more pronounced shadow
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Improved padding for a better tactile feel
+                    textStyle: const TextStyle(
+                      letterSpacing: 1.2, // Increase letter spacing for a more open look
+                    ),
+                  ),
+                  child: const Text(
+                    'Start Session & Attendance',
+                    style: TextStyle(
+                      fontSize: 16, // Slightly larger text for better readability
+                    ),
+                  ),
+                  
+                ),
         ),
         Expanded(
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
               : ListView.separated(
                   itemCount: sessions.length,
-                  separatorBuilder: (context, index) => const Divider(),
+                  separatorBuilder: (context, index) => SizedBox(height: 8), // Adjust for spacing between cards
                   itemBuilder: (context, index) {
-                    final session = sessions[index];
-                    return ListTile(
-                      title: Text('Session ${index + 1} - ${DateFormat('yyyy-MM-dd HH:mm').format(session.datetime)}'),
-                      onTap: () {
-                        // Implement your onTap functionality here
-                        // widget.setCurrentSessionId(session.id);
-                      },
+                    final session = sessions[sessions.length - index - 1];
+                    // Determine if the session's year is the current year
+                    bool isCurrentYear = DateTime.now().year == session.datetime.year;
+                    return Card(
+                      elevation: 2, // Adds shadow to create an elevated effect
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Margin to space out the cards
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10), // Rounded corners for a smoother look
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding inside the card
+                        child: ListTile(
+                          leading: const Icon(Icons.event, color: Color.fromARGB(162, 0, 0, 0)), // Icon for visual identification
+                          title: Text(
+                            DateFormat(isCurrentYear ? 'EEE, MMM d' : 'EEE, MMM d, yyyy').format(session.datetime),
+                            style: const TextStyle(
+                              fontSize: 18, // Larger font for date
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(196, 0, 0, 0), // Slightly dark color for emphasis
+                            ),
+                          ),
+                          subtitle: Text(
+                            DateFormat('HH:mm').format(session.datetime), // Time displayed smaller
+                            style: const TextStyle(
+                              fontSize: 14, // Smaller font size for time
+                              color: Color.fromARGB(104, 0, 0, 0), // A lighter shade for contrast
+                            ),
+                          ),
+                          onTap: () {
+                            // Implement your onTap functionality here
+                            widget.setCurrentSessionId(session.id);
+                          },
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -220,11 +233,22 @@ class _SessionManagerState extends State<SessionManager> {
 }
 
 class AttendanceResultOfToday extends StatefulWidget {
-  final List<Student> allStudents;
+  final String sessionId;
+  final String courseId;
+  final Database database;
 
-  const AttendanceResultOfToday({super.key, required this.allStudents});
+  const AttendanceResultOfToday({super.key, required this.sessionId, required this.courseId, required this.database});
 
-  String findTodaysTotalAttendance() {
+
+  @override
+  State<AttendanceResultOfToday> createState() =>
+      _AttendanceResultOfTodayState();
+}
+
+class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
+
+  bool updating = false;
+  String findTodaysTotalAttendance(List<Student> allStudents) {
     int count = 0;
     for (var student in allStudents) {
       if (student.isPresent) {
@@ -235,76 +259,107 @@ class AttendanceResultOfToday extends StatefulWidget {
   }
 
   @override
-  State<AttendanceResultOfToday> createState() =>
-      _AttendanceResultOfTodayState();
-}
-
-class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
-  @override
   Widget build(BuildContext context) {
-    String todaysTotalAttendance = widget.findTodaysTotalAttendance();
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "Total Attendance: $todaysTotalAttendance",
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.allStudents.length,
-              itemBuilder: (context, index) {
-                final student = widget.allStudents[index];
-                return ListTile(
-                  title: Text(student.name),
-                  subtitle: Text(student.entryNumber),
-                  leading: student.isPresent
-                      ? const Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        )
-                      : const Icon(
-                          Icons.close,
-                          color: Colors.red,
-                        ),
-                  trailing: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'mark_present') {
-                        // TODO: Implement the logic to mark the student as present
-                        setState(() {
-                          student.markPresent();
-                        });
-                      } else {
-                        // TODO: Implement the logic to mark the student as absent
-                        setState(() {
-                          student.markAbsent();
-                        });
-                      }
-                    },
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'mark_present',
-                        child: Text('Mark Present'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'mark_absent',
-                        child: Text('Mark Absent'),
-                      ),
-                    ],
+    
+    return FutureBuilder<List<Student>>(
+      future: widget.database.getPresentStudents(widget.courseId, widget.sessionId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return buildErrorWidget(context, snapshot.error, () {setState(() { });});
+        } else {
+          List<Student> allStudents = snapshot.data!;
+          String todaysTotalAttendance = findTodaysTotalAttendance(allStudents);
+          return updating ? const CircularProgressIndicator(): Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Logic to handle on press
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0), // Softer rounded corners
+                    ),
+                    elevation: 3, // Slightly higher elevation for a more pronounced shadow
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Improved padding for a better tactile feel
+                    textStyle: const TextStyle(
+                      letterSpacing: 1.2, // Increase letter spacing for a more open look
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                  child: const Text(
+                    'Take Attendance',
+                    style: TextStyle(
+                      fontSize: 16, // Slightly larger text for better readability
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Today\'s Attendance: $todaysTotalAttendance',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
+              Expanded( // This will take all available space
+                child: ListView.builder(
+                  itemCount: allStudents.length,
+                  itemBuilder: (context, index) {
+                    final student = allStudents[index];
+                    return ListTile(
+                      title: Text(student.entryNumber),
+                      leading: student.isPresent
+                          ? const Icon(Icons.check, color: Colors.green)
+                          : const Icon(Icons.close, color: Colors.red),
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (value) {
+                          setState(() async {
+                            if (value == 'mark_present') {
+                              setState(() {
+                                updating = true;
+                              });
+                              await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, true);
+                              setState(() {
+                                updating = false;
+                              });
+                            } else {
+                              setState(() {
+                                updating = true;
+                              });
+                              await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, false);
+                              setState(() {
+                                updating = false;
+                              });
+                            }
+                          });
+                        },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          const PopupMenuItem<String>(
+                            value: 'mark_present',
+                            child: Text('Mark Present'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'mark_absent',
+                            child: Text('Mark Absent'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 }
@@ -525,7 +580,6 @@ class _CourseSettingsState extends State<CourseSettings> {
     );
   }
 }
-
 
 
 class CSVUploaderWidget extends StatefulWidget {

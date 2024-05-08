@@ -73,8 +73,15 @@ class _StudentHomePageScaffoldState extends State<StudentHomePageScaffold> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Classes'),
-        backgroundColor: Colors.blue,
+        title: const Text(
+          'Classes',
+          style: TextStyle(
+            fontSize: 25, // Increase font size for better visibility
+            fontWeight: FontWeight.bold, // Added font weight for better readability
+          ),
+        ),
+        backgroundColor: Theme.of(context).primaryColor, // A slightly deeper shade of blue
+        elevation: 4.0, // Increased elevation for a subtle shadow effect
       ),
       drawer: MyNavigationDrawer(allCourses: widget.allCourses, isTeacher: false, auth: widget.auth, user: widget.user, database: widget.database, currentPage: "Classes", onUpdate: widget.onUpdate,),
       floatingActionButton: FloatingActionButton(

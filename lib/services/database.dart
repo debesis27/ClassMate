@@ -1,4 +1,5 @@
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/Models/student_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -271,4 +272,31 @@ class Database {
       await usersCollection.doc(user.email!.substring(0, 11)).delete();
     }
   }
+
+  Future<List<Student>> getPresentStudents(String courseId, String sessionId) async{
+    DocumentSnapshot todayAttendenceDocumentSnapshot= await courseCollection.doc(courseId).collection('Attendance').doc(sessionId).get();
+    DocumentSnapshot courseSnapshot = await courseCollection.doc(courseId).get();
+
+    List<String> studentsUidList = List<String>.from(courseSnapshot['Students Uid']);
+    Map<String, dynamic> todayAttendenceData = todayAttendenceDocumentSnapshot.data() as Map<String, dynamic>;
+
+    List<Student> presentStudents = [];
+    for(String studentUid in studentsUidList){
+      if(todayAttendenceData[studentUid] == true){
+        presentStudents.add(Student(entryNumber: studentUid, isPresent: true));
+      } else {
+        presentStudents.add(Student(entryNumber: studentUid, isPresent: false));
+      }
+    }
+    return presentStudents;
+  }
+
+  Future<void> markstudentInCourseOnSession(String courseId, String sessionId, String studentEntryNumber, bool markPresent) async {
+    DocumentSnapshot todayAttendenceDocumentSnapshot= await courseCollection.doc(courseId).collection('Attendance').doc(sessionId).get();
+    Map<String, dynamic> todayAttendenceData = todayAttendenceDocumentSnapshot.data() as Map<String, dynamic>;
+    todayAttendenceData[studentEntryNumber] = markPresent;
+    await courseCollection.doc(courseId).collection('Attendance').doc(sessionId).update(todayAttendenceData);
+  }
+
+  
 }

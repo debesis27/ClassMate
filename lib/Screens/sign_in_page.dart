@@ -1,5 +1,6 @@
 import 'package:ClassMate/Screens/Student/home_screen_student.dart';
 import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
+import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/Screens/register_page.dart';
 import 'package:ClassMate/bluetooth/advertising.dart';
 import 'package:ClassMate/services/database.dart';
@@ -42,32 +43,60 @@ class _SignInPageState extends State<SignInPage> {
       // if the user is not registered, then show the option to chose the role
       return FutureBuilder(
         future: database.isRegistered(),
-        builder: (context, snapshot){
-          if (snapshot.connectionState == ConnectionState.waiting){
-            return const Center(
-              child: CircularProgressIndicator(),
-              );
-          } 
-          if (snapshot.hasError){
-            return Center(
-              child: Text('${snapshot.error}'),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+              color: Colors.white, // Set the background color to white
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Card(
+                      elevation: 10, // Adds shadow to make the card stand out
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), // Rounded corners for the card
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0), // Padding inside the card
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Set the progress indicator color to blue
+                            ),
+                            SizedBox(height: 20), // Provide some space between the spinner and the text
+                            Text(
+                              'Loading, please wait...',
+                              style: TextStyle(
+                                color: Colors.black, // Set text color to black for contrast
+                                fontSize: 16, // Set font size
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
+
           }
-          if (snapshot.data == 1){
+          if (snapshot.hasError) {
+            return buildErrorWidget(context, snapshot.error, () { setState(() {});});
+          }
+          if (snapshot.data == 1) {
             userIsRegistered = true;
             userIsTeacher = true;
             return TeacherHomePage(auth: _auth, user: _user!);
-          } else if (snapshot.data == 2){
+          } else if (snapshot.data == 2) {
             userIsRegistered = true;
             userIsTeacher = false;
-            startAdvertising(id: _user!.email!.substring(0, 11));
             return StudentHomePage(auth: _auth, user: _user!,);
-          } else{
+          } else {
             return ChoisePage(user: _user!, auth: _auth, database: database);
           }
         }
       );
-    } else {
+      } else {
       userIsRegistered = false;
       return WelcomeScreen(auth: _auth);
     }

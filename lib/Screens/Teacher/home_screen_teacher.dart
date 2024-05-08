@@ -1,6 +1,7 @@
 import 'package:ClassMate/Datasource/dummy_courses_list.dart';
 import 'package:ClassMate/Screens/Teacher/add_new_course.dart';
 import 'package:ClassMate/Screens/common_screen_widgets.dart';
+import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/services/database.dart';
 // import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +41,7 @@ class _TeacherHomePage extends State<TeacherHomePage> {
             onUpdate: update,
           );
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return buildErrorWidget(context, snapshot.error, update);
         }else{
           allCourses = snapshot.data;
           return TeacherHomeScreenScaffold(
@@ -76,8 +77,15 @@ class TeacherHomeScreenScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Classes'),
-        backgroundColor: Colors.blue,
+        title: const Text(
+          'Classes',
+          style: TextStyle(
+            fontSize: 25, // Increase font size for better visibility
+            fontWeight: FontWeight.bold, // Added font weight for better readability
+          ),
+        ),
+        backgroundColor: Theme.of(context).primaryColor, // A slightly deeper shade of blue
+        elevation: 4.0, // Increased elevation for a subtle shadow effect
       ),
       drawer: MyNavigationDrawer(
         allCourses: allCourses,
@@ -92,23 +100,28 @@ class TeacherHomeScreenScaffold extends StatelessWidget {
         allCourses: allCourses,
         isTeacher: true,
         database: database,
-        onUpdate: onChanged
+        onUpdate: onChanged,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddNewCourse(user: user, onUpdate: onChanged)
+              builder: (context) => AddNewCourse(user: user, onUpdate: onChanged),
             ),
           );
         },
         backgroundColor: Colors.blue,
+        elevation: 8.0, // Added elevation for the FAB
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(25.0), // More pronounced rounded corners
         ),
-        child: const Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          size: 30, // Increase icon size for better visibility
+        ),
       ),
     );
+
   }
 }
