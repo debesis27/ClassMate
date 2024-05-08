@@ -259,7 +259,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                   child: ScaleTransition(
                     scale: _scale!,
                     child: const Text(
-                      'Welcome to Zoop',
+                      'Welcome to ClassMate',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
