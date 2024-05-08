@@ -335,13 +335,22 @@ class Database {
     studentStats['absentCount'] = absentCount;
 
     CollectionReference marksCollection = courseCollection.doc(courseId).collection('Marks');
+    Map<String, dynamic> maxMarks = {};
+    DocumentSnapshot maxMarksDoc = await marksCollection.doc('max').get();
+    if(maxMarksDoc.exists){
+      maxMarks = maxMarksDoc.data() as Map<String, dynamic>;
+    }
+
     DocumentSnapshot studentMarksDocument = await marksCollection.doc(user.email!.substring(0, 11)).get();
     if (studentMarksDocument.exists) {
       studentStats['Marks'] = studentMarksDocument.data() as Map<String, dynamic>;
+      studentStats['Marks'].forEach((key, value) {
+        studentStats['Marks'][key] = '$value / ${maxMarks[key]}';
+       });
     } else {
       studentStats['Marks'] = {'No Quiz Marks Available': ''};
     }
-    print(studentStats.toString());
+    print(studentStats['Marks']);
     return studentStats;
   }
 
