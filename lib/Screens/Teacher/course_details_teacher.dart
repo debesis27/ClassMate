@@ -406,6 +406,15 @@ class AttendanceStats extends StatelessWidget {
                 ListTile(
                   title: Text('Total Attendance: ${student.totalAttendance}'),
                 ),
+                 if (student.marks.isNotEmpty) // Check if marks are available
+                    ListTile(
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: student.marks.entries.map((entry) {
+                          return Text('${entry.key}: ${entry.value}');
+                        }).toList(),
+                      ),
+                    ),
               ],
             ),
           );
