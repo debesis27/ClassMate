@@ -2,15 +2,13 @@ import 'package:ClassMate/Marks/CSV.dart';
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Models/session_info.dart';
 import 'package:ClassMate/Models/student_model.dart';
+import 'package:ClassMate/Screens/common_screen_widgets.dart';
 import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-
-
 
 class TeacherCourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -101,7 +99,9 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
         body: TabBarView(
           children: [
             Center(
-              child: sessionId != "" ? AttendanceResultOfToday(sessionId: sessionId, courseId: widget.course.courseReferenceId, database: widget.database) : SessionManager(courseId: widget.course.courseReferenceId, setCurrentSessionId: setCurrentSessionId),
+              child: sessionId != ""
+                ? AttendanceResultOfToday(sessionId: sessionId, courseId: widget.course.courseReferenceId, database: widget.database)
+                : SessionManager(courseId: widget.course.courseReferenceId, setCurrentSessionId: setCurrentSessionId),
             ),
             Center(
               child: AttendanceStats(allStudents: students),
@@ -187,43 +187,10 @@ class _SessionManagerState extends State<SessionManager> {
               ? const Center(child: CircularProgressIndicator())
               : ListView.separated(
                   itemCount: sessions.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 8), // Adjust for spacing between cards
+                  separatorBuilder: (context, index) => const SizedBox(height: 8), // Adjust for spacing between cards
                   itemBuilder: (context, index) {
                     final session = sessions[sessions.length - index - 1];
-                    // Determine if the session's year is the current year
-                    bool isCurrentYear = DateTime.now().year == session.datetime.year;
-                    return Card(
-                      elevation: 2, // Adds shadow to create an elevated effect
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Margin to space out the cards
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10), // Rounded corners for a smoother look
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding inside the card
-                        child: ListTile(
-                          leading: const Icon(Icons.event, color: Color.fromARGB(162, 0, 0, 0)), // Icon for visual identification
-                          title: Text(
-                            DateFormat(isCurrentYear ? 'EEE, MMM d' : 'EEE, MMM d, yyyy').format(session.datetime),
-                            style: const TextStyle(
-                              fontSize: 18, // Larger font for date
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(196, 0, 0, 0), // Slightly dark color for emphasis
-                            ),
-                          ),
-                          subtitle: Text(
-                            DateFormat('HH:mm').format(session.datetime), // Time displayed smaller
-                            style: const TextStyle(
-                              fontSize: 14, // Smaller font size for time
-                              color: Color.fromARGB(104, 0, 0, 0), // A lighter shade for contrast
-                            ),
-                          ),
-                          onTap: () {
-                            // Implement your onTap functionality here
-                            widget.setCurrentSessionId(session.id);
-                          },
-                        ),
-                      ),
-                    );
+                    return SessionCard(session: session, setCurrentSessionId: widget.setCurrentSessionId);
                   },
                 ),
         ),
@@ -277,7 +244,7 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Logic to handle on press
+                    //TODO: Logic to handle on press
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
@@ -601,9 +568,9 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
       children: <Widget>[
         ElevatedButton(
           onPressed: _pickAndUploadCSV,
-          child: Text('Pick and Upload CSV'),
+          child: const Text('Pick and Upload CSV'),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Text(_statusMessage),
       ],
     );

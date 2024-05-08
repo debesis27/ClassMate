@@ -1,4 +1,5 @@
 import 'package:ClassMate/Models/course_info_model.dart';
+import 'package:ClassMate/Models/session_info.dart';
 // import 'package:ClassMate/Screens/Student/home_screen_student.dart';
 // import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/Screens/account_page.dart';
@@ -6,6 +7,7 @@ import 'package:ClassMate/Screens/common_utils.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'Student/course_details_student.dart';
 import 'Teacher/course_details_teacher.dart';
@@ -339,6 +341,63 @@ class SkeletonHomeScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class SessionCard extends StatelessWidget {
+  const SessionCard({
+    Key? key,
+    required this.session,
+    required this.setCurrentSessionId,
+  }) : super(key: key);
+
+  final Session session;
+  final Function setCurrentSessionId;
+
+  @override
+  Widget build(BuildContext context) {
+    // Determine if the session's year is the current year
+    bool isCurrentYear = DateTime.now().year == session.datetime.year;
+
+    return Card(
+      elevation: 2, // Adds shadow to create an elevated effect
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Margin to space out the cards
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10), // Rounded corners for a smoother look
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding inside the card
+        child: ListTile(
+          leading: const Icon(Icons.event, color: Color.fromARGB(162, 0, 0, 0), size: 35), // Icon for visual identification
+          title: Text(
+            'Session - ${session.id}',
+            style: const TextStyle(
+              fontSize: 18, // Larger font for session ID
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(196, 0, 0, 0), // Slightly dark color for emphasis
+            ),
+          ),
+          subtitle: Text(
+            DateFormat(isCurrentYear ? 'EEE, MMM d' : 'EEE, MMM d, yyyy').format(session.datetime),
+            style: const TextStyle(
+              fontSize: 14, // Smaller font size for date
+              color: Color.fromARGB(104, 0, 0, 0), // A lighter shade for contrast
+            ),
+          ),
+          trailing: Text(
+            DateFormat('HH:mm').format(session.datetime), // Time displayed as trailing text
+            style: const TextStyle(
+              fontSize: 14, // Smaller font size for time
+              color: Color.fromARGB(104, 0, 0, 0), // A lighter shade for contrast
+            ),
+          ),
+          onTap: () {
+            // Implement your onTap functionality here
+            setCurrentSessionId(session.id);
+          },
+        ),
       ),
     );
   }

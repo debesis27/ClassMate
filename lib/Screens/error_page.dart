@@ -7,25 +7,25 @@ Widget buildErrorWidget(BuildContext context, dynamic error, VoidCallback refres
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.error_outline, color: Colors.red, size: 40), // Add an icon for visual feedback
-          SizedBox(height: 20),
-          Text(
+          const Icon(Icons.error_outline, color: Colors.red, size: 40), // Add an icon for visual feedback
+          const SizedBox(height: 20),
+          const Text(
             "Oops! Connection error occurred.",
             style: TextStyle(color: Colors.black54, fontSize: 16), // Styling the text
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             "$error", // Display the error passed to the function
-            style: TextStyle(color: Colors.redAccent, fontSize: 14), // Error details in a more subtle tone
+            style: const TextStyle(color: Colors.redAccent, fontSize: 14), // Error details in a more subtle tone
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: refreshFunction, // Use the passed function for the button
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue, // Button color
               foregroundColor: Colors.white, // Text color
             ),
-            child: Text('Try Again'),
+            child: const Text('Try Again'),
           ),
         ],
       ),

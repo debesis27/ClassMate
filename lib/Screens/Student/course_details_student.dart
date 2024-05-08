@@ -1,5 +1,6 @@
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Models/session_info.dart';
+import 'package:ClassMate/Screens/common_screen_widgets.dart';
 import 'package:ClassMate/bluetooth/advertising.dart';
 // import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:ClassMate/services/database.dart';
@@ -7,7 +8,6 @@ import 'package:ClassMate/services/get_sessions.dart';
 // import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 class StudentCourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -21,6 +21,15 @@ class StudentCourseDetailScreen extends StatefulWidget {
 }
 
 class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> with WidgetsBindingObserver {
+  String currentSessionId = '';
+  bool isPresent = false;
+
+  void setCurrentSessionId(String sessionId) {
+    setState(() {
+      currentSessionId = sessionId;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,10 +71,12 @@ class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> w
         body: TabBarView(
           children: [
             Center(
-              child: SessionManager(courseId: widget.course.courseReferenceId, entryNumber: widget.database.user.email!.substring(0, 11)),
+              child: currentSessionId == ""
+                ? SessionManager(courseId: widget.course.courseReferenceId, entryNumber: widget.database.user.email!.substring(0, 11), setCurrentSessionId: setCurrentSessionId)
+                : AttendanceResultOfToday(isPresent: isPresent),
             ),
-            Center(
-              child: Text('Stats for ${widget.course.courseCode}'),
+            const Center(
+              child: StudentStats(totalAttendance: 10, quizMarks: {'Quiz 1': '10', 'Quiz 2': '20'}),
             ),
           ],
         ),
@@ -74,16 +85,16 @@ class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> w
   }
 }
 
-
 class SessionManager extends StatefulWidget {
   final String courseId;
   final String entryNumber;
-  const SessionManager({super.key, required this.courseId, required this.entryNumber});
+  final Function setCurrentSessionId;
+
+  const SessionManager({super.key, required this.courseId, required this.entryNumber, required this.setCurrentSessionId});
 
   @override
   State<SessionManager> createState() => _SessionManagerState();
 }
-
 
 class _SessionManagerState extends State<SessionManager> {
   List<Session> sessions = [];
@@ -150,43 +161,10 @@ class _SessionManagerState extends State<SessionManager> {
               ? const Center(child: CircularProgressIndicator())
               : ListView.separated(
                   itemCount: sessions.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 8), // Adjust for spacing between cards
+                  separatorBuilder: (context, index) => const SizedBox(height: 8), // Adjust for spacing between cards
                   itemBuilder: (context, index) {
                     final session = sessions[sessions.length - index - 1];
-                    // Determine if the session's year is the current year
-                    bool isCurrentYear = DateTime.now().year == session.datetime.year;
-                    return Card(
-                      elevation: 2, // Adds shadow to create an elevated effect
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Margin to space out the cards
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10), // Rounded corners for a smoother look
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // Padding inside the card
-                        child: ListTile(
-                          leading: const Icon(Icons.event, color: Color.fromARGB(162, 0, 0, 0)), // Icon for visual identification
-                          title: Text(
-                            DateFormat(isCurrentYear ? 'EEE, MMM d' : 'EEE, MMM d, yyyy').format(session.datetime),
-                            style: const TextStyle(
-                              fontSize: 18, // Larger font for date
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(196, 0, 0, 0), // Slightly dark color for emphasis
-                            ),
-                          ),
-                          subtitle: Text(
-                            DateFormat('HH:mm').format(session.datetime), // Time displayed smaller
-                            style: const TextStyle(
-                              fontSize: 14, // Smaller font size for time
-                              color: Color.fromARGB(104, 0, 0, 0), // A lighter shade for contrast
-                            ),
-                          ),
-                          onTap: () {
-                            // Implement your onTap functionality here
-                            // widget.setCurrentSessionId(session.id);
-                          },
-                        ),
-                      ),
-                    );
+                    return SessionCard(session: session, setCurrentSessionId: widget.setCurrentSessionId);
                   },
                 ),
         ),
@@ -195,6 +173,153 @@ class _SessionManagerState extends State<SessionManager> {
   }
 }
 
+class AttendanceResultOfToday extends StatelessWidget {
+  final bool isPresent;
+
+  const AttendanceResultOfToday({super.key, required this.isPresent});
+
+  @override
+  Widget build (BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isPresent ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
+            color: isPresent ? Colors.green : Colors.red,
+            size: 100,
+          ),
+          Text(
+            isPresent ? 'You have been marked present' : 'Your attendance is not taken yet',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StudentStats extends StatelessWidget {
+  final int totalAttendance;
+  final Map<String, String> quizMarks;
+
+  const StudentStats({
+    super.key,
+    required this.totalAttendance,
+    required this.quizMarks,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Attendance Stats',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 15.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Attendance:',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        '$totalAttendance%',
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Quiz Marks',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 15.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: quizMarks.entries.map((entry) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              entry.key,
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              entry.value,
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class CourseSettings extends StatelessWidget {
   final Course course;
