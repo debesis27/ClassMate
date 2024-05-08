@@ -3,10 +3,8 @@ import 'package:ClassMate/Models/session_info.dart';
 import 'package:ClassMate/Screens/common_screen_widgets.dart';
 import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/bluetooth/advertising.dart';
-// import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
-// import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,7 +21,6 @@ class StudentCourseDetailScreen extends StatefulWidget {
 
 class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> with WidgetsBindingObserver {
   String currentSessionId = '';
-  bool isPresent = false;
 
   void setCurrentSessionId(String sessionId) {
     setState(() {
@@ -74,7 +71,7 @@ class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> w
             Center(
               child: currentSessionId == ""
                 ? SessionManager(courseId: widget.course.courseReferenceId, entryNumber: widget.database.user.email!.substring(0, 11), setCurrentSessionId: setCurrentSessionId)
-                : AttendanceResultOfToday(isPresent: isPresent),
+                : AttendanceResultOfToday(sessionId: currentSessionId, courseId: widget.course.courseReferenceId, database: widget.database),
             ),
             FutureBuilder(
               future: widget.database.getStudentStats(widget.course.courseReferenceId),
@@ -189,30 +186,44 @@ class _SessionManagerState extends State<SessionManager> {
 }
 
 class AttendanceResultOfToday extends StatelessWidget {
-  final bool isPresent;
+  final String sessionId;
+  final String courseId;
+  final Database database;
+  bool isPresent = false;
 
-  const AttendanceResultOfToday({super.key, required this.isPresent});
+  AttendanceResultOfToday({super.key, required this.sessionId, required this.courseId, required this.database, this.isPresent = false});
 
   @override
   Widget build (BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isPresent ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
-            color: isPresent ? Colors.green : Colors.red,
-            size: 100,
-          ),
-          Text(
-            isPresent ? 'You have been marked present' : 'Your attendance is not taken yet',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return FutureBuilder<bool>(
+      future: database.isStudentPresentInCourseOnSession(courseId, sessionId).then((value) => isPresent = value),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }else if(snapshot.hasError){
+          return const Center(child: Text('Error fetching attendance data'));
+        }else{
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isPresent ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
+                  color: isPresent ? Colors.green : Colors.red,
+                  size: 100,
+                ),
+                Text(
+                  isPresent ? 'You have been marked present' : 'Your attendance is not taken yet',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }
+      }
     );
   }
 }

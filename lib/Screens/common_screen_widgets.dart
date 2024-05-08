@@ -347,10 +347,10 @@ class SkeletonHomeScreen extends StatelessWidget {
 
 class SessionCard extends StatelessWidget {
   const SessionCard({
-    Key? key,
+    super.key,
     required this.session,
     required this.setCurrentSessionId,
-  }) : super(key: key);
+  });
 
   final Session session;
   final Function setCurrentSessionId;
@@ -393,7 +393,6 @@ class SessionCard extends StatelessWidget {
             ),
           ),
           onTap: () {
-            // Implement your onTap functionality here
             setCurrentSessionId(session.id);
           },
         ),
