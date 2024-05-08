@@ -7,6 +7,7 @@ import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 class StudentCourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -21,6 +22,10 @@ class StudentCourseDetailScreen extends StatefulWidget {
 
 class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> with WidgetsBindingObserver {
   String currentSessionId = '';
+
+  void reload () {
+    setState(() {});
+  }
 
   void setCurrentSessionId(String sessionId) {
     setState(() {
@@ -63,6 +68,10 @@ class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> w
             ],
           ),
           actions: [
+            GestureDetector(
+                onTap: () {setState(() {});},
+                child: const Icon(Icons.refresh, size: 28, semanticLabel: 'Refresh')
+              ),
             CourseSettings(course: widget.course, database: widget.database, onUpdate: widget.onUpdate,),
           ]
         ),
