@@ -82,6 +82,13 @@ class _StudentHomePageScaffoldState extends State<StudentHomePageScaffold> {
         ),
         backgroundColor: Theme.of(context).primaryColor, // A slightly deeper shade of blue
         elevation: 4.0, // Increased elevation for a subtle shadow effect
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              await widget.onUpdate();
+            },)
+        ],
       ),
       drawer: MyNavigationDrawer(allCourses: widget.allCourses, isTeacher: false, auth: widget.auth, user: widget.user, database: widget.database, currentPage: "Classes", onUpdate: widget.onUpdate,),
       floatingActionButton: FloatingActionButton(

@@ -86,6 +86,13 @@ class TeacherHomeScreenScaffold extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).primaryColor, // A slightly deeper shade of blue
         elevation: 4.0, // Increased elevation for a subtle shadow effect
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              await onChanged();
+            },)
+        ],
       ),
       drawer: MyNavigationDrawer(
         allCourses: allCourses,
