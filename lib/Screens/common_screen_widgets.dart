@@ -142,7 +142,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
   Widget build(BuildContext context) {
     // Widget homePage;
     final FirebaseAuth auth = widget.auth;
-    final User user = widget.user;
+    // final User user = widget.user;
 
     // if (widget.isTeacher) {
     //   homePage = TeacherHomePage(
@@ -195,7 +195,6 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                         MaterialPageRoute(
                             builder: (context) => AccountPage(
                                 auth: auth,
-                                user: user,
                                 allCourses: widget.allCourses,
                                 isTeacher: widget.isTeacher,
                                 database: widget.database,

@@ -7,7 +7,7 @@ import 'package:ClassMate/Screens/sign_in_page.dart';
 
 class AccountPage extends StatefulWidget {
   final FirebaseAuth auth;
-  User? user;
+  // User? user;
   final Database database;
   final List<Course> allCourses;
   final bool isTeacher;
@@ -16,7 +16,7 @@ class AccountPage extends StatefulWidget {
   AccountPage({
     super.key,
     required this.auth,
-    this.user,
+    // this.user,
     required this.database,
     required this.allCourses,
     required this.isTeacher,
@@ -28,9 +28,10 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  User? user = FirebaseAuth.instance.currentUser;
   void reload(){
     setState(() {
-      widget.user = FirebaseAuth.instance.currentUser;
+      user = FirebaseAuth.instance.currentUser;
     });
   }
   @override
@@ -50,8 +51,8 @@ class _AccountPageState extends State<AccountPage> {
       drawer: MyNavigationDrawer(
         isTeacher: widget.isTeacher,
         auth: widget.auth,
-        user: widget.user!,
-        database: Database(user: widget.user!),
+        user: user!,
+        database: Database(user: user!),
         allCourses: widget.allCourses,
         currentPage: "Account",
         onUpdate: widget.onUpdate,
@@ -59,9 +60,9 @@ class _AccountPageState extends State<AccountPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            AccountCard(user: widget.user!, isTeacher: widget.isTeacher),
+            AccountCard(user: user!, isTeacher: widget.isTeacher),
             const SizedBox(height: 10),
-            AccountPersonalInfo(user: widget.user!, isTeacher: widget.isTeacher, refreshAccountPage: reload),
+            AccountPersonalInfo(user: user!, isTeacher: widget.isTeacher, refreshAccountPage: reload),
             const SizedBox(height: 15),
             AccountLogoutCard(auth: widget.auth, context: context),
             AccountDeleteCard(auth: widget.auth, database: widget.database, context: context),
