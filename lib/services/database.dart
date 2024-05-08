@@ -344,4 +344,52 @@ class Database {
     print(studentStats.toString());
     return studentStats;
   }
+
+  Future<List<Student>> getAllStudentsdata(String courseId) async {
+    List<String> studentsUidList = [];
+    await courseCollection.doc(courseId).get().then((courseDocumentSnapshot){
+      studentsUidList = List<String>.from(courseDocumentSnapshot['Students Uid']);
+    });
+    Map<String, int> studentAttendence = {};
+    for (String studentUid in studentsUidList) {
+      studentAttendence[studentUid] = 0;
+    }
+    CollectionReference attendanceCollection = courseCollection.doc(courseId).collection('Attendance');
+    await attendanceCollection.get().then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> SessionData = doc.data() as Map<String, dynamic>;
+        for (String studentUid in studentsUidList) {
+          if (SessionData[studentUid] == true) {
+            studentAttendence[studentUid] = studentAttendence[studentUid]! + 1;
+          }
+        }
+      });
+    });
+
+    Map<String, String> studentNames = {};
+    for (String StudentId in studentsUidList) {
+      DocumentSnapshot studentDocumentSnapshot = await usersCollection.doc(StudentId).get();
+      studentNames[StudentId] = studentDocumentSnapshot['Name'];
+    }
+
+    Map<String, dynamic> studentMarks = {};
+    CollectionReference marksCollection = courseCollection.doc(courseId).collection('Marks');
+    await marksCollection.get().then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        studentMarks[doc.id] = doc.data() as Map<String, dynamic>;
+      });
+    });
+
+    List<Student> allStudents = [];
+    for (String studentUid in studentsUidList) {
+      allStudents.add(Student(
+        entryNumber: studentUid,
+        name: studentNames[studentUid] ?? "",
+        totalAttendance: studentAttendence[studentUid] ?? 0,
+        marks: studentMarks[studentUid] ?? {'No Quiz Marks Available': ''},
+      ));
+    }
+
+    return allStudents;
+  }
 }
