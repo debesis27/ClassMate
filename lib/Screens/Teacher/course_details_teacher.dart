@@ -9,6 +9,7 @@ import 'package:ClassMate/services/get_sessions.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 class TeacherCourseDetailScreen extends StatefulWidget {
   final Course course;
@@ -16,7 +17,10 @@ class TeacherCourseDetailScreen extends StatefulWidget {
   final Function onUpdate;
 
   const TeacherCourseDetailScreen(
-      {super.key, required this.course, required this.database, required this.onUpdate});
+      {super.key,
+      required this.course,
+      required this.database,
+      required this.onUpdate});
 
   @override
   State<TeacherCourseDetailScreen> createState() =>
@@ -83,31 +87,42 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-            title: Text(widget.course.courseCode, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            title: Text(widget.course.courseCode,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             backgroundColor: Theme.of(context).primaryColor,
             elevation: 4.0,
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'Attendance'),
                 Tab(text: 'Students'),
-                Tab(text: 'Marks Upload (CSV)'),
+                Tab(text: 'Marks'),
               ],
             ),
             actions: [
-              CourseSettings(course: widget.course, database: widget.database, onUpdate: widget.onUpdate)
+              CourseSettings(
+                  course: widget.course,
+                  database: widget.database,
+                  onUpdate: widget.onUpdate)
             ]),
         body: TabBarView(
           children: [
             Center(
               child: sessionId != ""
-                ? AttendanceResultOfToday(sessionId: sessionId, courseId: widget.course.courseReferenceId, database: widget.database)
-                : SessionManager(courseId: widget.course.courseReferenceId, setCurrentSessionId: setCurrentSessionId),
+                  ? AttendanceResultOfToday(
+                      sessionId: sessionId,
+                      courseId: widget.course.courseReferenceId,
+                      database: widget.database)
+                  : SessionManager(
+                      courseId: widget.course.courseReferenceId,
+                      setCurrentSessionId: setCurrentSessionId),
             ),
             Center(
               child: AttendanceStats(allStudents: students),
             ),
             Center(
-              child: CSVUploaderWidget(courseId: widget.course.courseReferenceId),
+              child:
+                  CSVUploaderWidget(courseId: widget.course.courseReferenceId),
             ),
           ],
         ),
@@ -119,7 +134,8 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
 class SessionManager extends StatefulWidget {
   final String courseId;
   final Function setCurrentSessionId;
-  const SessionManager({super.key, required this.courseId, required this.setCurrentSessionId});
+  const SessionManager(
+      {super.key, required this.courseId, required this.setCurrentSessionId});
 
   @override
   State<SessionManager> createState() => _SessionManagerState();
@@ -130,7 +146,8 @@ class _SessionManagerState extends State<SessionManager> {
   bool isLoading = true;
 
   Future<void> fetchSessions() async {
-    var sessions = await getSessions(widget.courseId);  // Assume this now returns List<Session>
+    var sessions = await getSessions(
+        widget.courseId); // Assume this now returns List<Session>
     setState(() {
       this.sessions = sessions;
       isLoading = false;
@@ -158,39 +175,47 @@ class _SessionManagerState extends State<SessionManager> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
-                  onPressed: () {
-                    createSession();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // Softer rounded corners
-                    ),
-                    elevation: 3, // Slightly higher elevation for a more pronounced shadow
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Improved padding for a better tactile feel
-                    textStyle: const TextStyle(
-                      letterSpacing: 1.2, // Increase letter spacing for a more open look
-                    ),
-                  ),
-                  child: const Text(
-                    'Start Session & Attendance',
-                    style: TextStyle(
-                      fontSize: 16, // Slightly larger text for better readability
-                    ),
-                  ),
-                  
-                ),
+            onPressed: () {
+              createSession();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  Colors.blueAccent, // A more vibrant shade of blue
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(12.0), // Softer rounded corners
+              ),
+              elevation:
+                  3, // Slightly higher elevation for a more pronounced shadow
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12), // Improved padding for a better tactile feel
+              textStyle: const TextStyle(
+                letterSpacing:
+                    1.2, // Increase letter spacing for a more open look
+              ),
+            ),
+            child: const Text(
+              'Start Session & Attendance',
+              style: TextStyle(
+                fontSize: 16, // Slightly larger text for better readability
+              ),
+            ),
+          ),
         ),
         Expanded(
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
               : ListView.separated(
                   itemCount: sessions.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8), // Adjust for spacing between cards
+                  separatorBuilder: (context, index) => const SizedBox(
+                      height: 8), // Adjust for spacing between cards
                   itemBuilder: (context, index) {
                     final session = sessions[sessions.length - index - 1];
-                    return SessionCard(session: session, setCurrentSessionId: widget.setCurrentSessionId);
+                    return SessionCard(
+                        session: session,
+                        setCurrentSessionId: widget.setCurrentSessionId);
                   },
                 ),
         ),
@@ -204,8 +229,11 @@ class AttendanceResultOfToday extends StatefulWidget {
   final String courseId;
   final Database database;
 
-  const AttendanceResultOfToday({super.key, required this.sessionId, required this.courseId, required this.database});
-
+  const AttendanceResultOfToday(
+      {super.key,
+      required this.sessionId,
+      required this.courseId,
+      required this.database});
 
   @override
   State<AttendanceResultOfToday> createState() =>
@@ -213,7 +241,6 @@ class AttendanceResultOfToday extends StatefulWidget {
 }
 
 class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
-
   bool updating = false;
   String findTodaysTotalAttendance(List<Student> allStudents) {
     int count = 0;
@@ -227,110 +254,135 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
 
   @override
   Widget build(BuildContext context) {
-    
     return FutureBuilder<List<Student>>(
-      future: widget.database.getPresentStudents(widget.courseId, widget.sessionId),
+      future:
+          widget.database.getPresentStudents(widget.courseId, widget.sessionId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return buildErrorWidget(context, snapshot.error, () {setState(() { });});
+          return buildErrorWidget(context, snapshot.error, () {
+            setState(() {});
+          });
         } else {
           List<Student> allStudents = snapshot.data!;
           String todaysTotalAttendance = findTodaysTotalAttendance(allStudents);
-          return updating ? const CircularProgressIndicator(): Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      updating = true;
-                    });
-                    await markAttendance(widget.courseId, sessionId: widget.sessionId);
-                    setState(() {
-                      updating = false;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // Softer rounded corners
-                    ),
-                    elevation: 3, // Slightly higher elevation for a more pronounced shadow
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Improved padding for a better tactile feel
-                    textStyle: const TextStyle(
-                      letterSpacing: 1.2, // Increase letter spacing for a more open look
-                    ),
-                  ),
-                  child: const Text(
-                    'Take Attendance',
-                    style: TextStyle(
-                      fontSize: 16, // Slightly larger text for better readability
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Today\'s Attendance: $todaysTotalAttendance',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Expanded( // This will take all available space
-                child: ListView.builder(
-                  itemCount: allStudents.length,
-                  itemBuilder: (context, index) {
-                    final student = allStudents[index];
-                    return ListTile(
-                      title: Text(student.entryNumber),
-                      leading: student.isPresent
-                          ? const Icon(Icons.check, color: Colors.green)
-                          : const Icon(Icons.close, color: Colors.red),
-                      trailing: PopupMenuButton<String>(
-                        onSelected: (value) {
-                          setState(() async {
-                            if (value == 'mark_present') {
-                              setState(() {
-                                updating = true;
-                              });
-                              await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, true);
-                              setState(() {
-                                updating = false;
-                              });
-                            } else {
-                              setState(() {
-                                updating = true;
-                              });
-                              await widget.database.markstudentInCourseOnSession(widget.courseId, widget.sessionId, student.entryNumber, false);
-                              setState(() {
-                                updating = false;
-                              });
-                            }
+          return updating
+              ? const CircularProgressIndicator()
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            updating = true;
+                          });
+                          await markAttendance(widget.courseId,
+                              sessionId: widget.sessionId);
+                          setState(() {
+                            updating = false;
                           });
                         },
-                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                          const PopupMenuItem<String>(
-                            value: 'mark_present',
-                            child: Text('Mark Present'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Colors.blueAccent, // A more vibrant shade of blue
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                12.0), // Softer rounded corners
                           ),
-                          const PopupMenuItem<String>(
-                            value: 'mark_absent',
-                            child: Text('Mark Absent'),
+                          elevation:
+                              3, // Slightly higher elevation for a more pronounced shadow
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical:
+                                  12), // Improved padding for a better tactile feel
+                          textStyle: const TextStyle(
+                            letterSpacing:
+                                1.2, // Increase letter spacing for a more open look
                           ),
-                        ],
+                        ),
+                        child: const Text(
+                          'Take Attendance',
+                          style: TextStyle(
+                            fontSize:
+                                16, // Slightly larger text for better readability
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Today\'s Attendance: $todaysTotalAttendance',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      // This will take all available space
+                      child: ListView.builder(
+                        itemCount: allStudents.length,
+                        itemBuilder: (context, index) {
+                          final student = allStudents[index];
+                          return ListTile(
+                            title: Text(student.entryNumber),
+                            leading: student.isPresent
+                                ? const Icon(Icons.check, color: Colors.green)
+                                : const Icon(Icons.close, color: Colors.red),
+                            trailing: PopupMenuButton<String>(
+                              onSelected: (value) {
+                                setState(() async {
+                                  if (value == 'mark_present') {
+                                    setState(() {
+                                      updating = true;
+                                    });
+                                    await widget.database
+                                        .markstudentInCourseOnSession(
+                                            widget.courseId,
+                                            widget.sessionId,
+                                            student.entryNumber,
+                                            true);
+                                    setState(() {
+                                      updating = false;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      updating = true;
+                                    });
+                                    await widget.database
+                                        .markstudentInCourseOnSession(
+                                            widget.courseId,
+                                            widget.sessionId,
+                                            student.entryNumber,
+                                            false);
+                                    setState(() {
+                                      updating = false;
+                                    });
+                                  }
+                                });
+                              },
+                              itemBuilder: (BuildContext context) =>
+                                  <PopupMenuEntry<String>>[
+                                const PopupMenuItem<String>(
+                                  value: 'mark_present',
+                                  child: Text('Mark Present'),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'mark_absent',
+                                  child: Text('Mark Absent'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
         }
       },
     );
@@ -368,7 +420,10 @@ class CourseSettings extends StatefulWidget {
   final Function onUpdate;
 
   const CourseSettings(
-      {super.key, required this.course, required this.database, required this.onUpdate});
+      {super.key,
+      required this.course,
+      required this.database,
+      required this.onUpdate});
 
   @override
   State<CourseSettings> createState() => _CourseSettingsState();
@@ -426,18 +481,18 @@ class _CourseSettingsState extends State<CourseSettings> {
             return AlertDialog(
                 title: const Text('Add Student'),
                 content: TextField(
-                  decoration: const InputDecoration(
-                    hintText: 'Enter Lowercase Entry no. '
-                  ),
-                  onChanged: (value) {
-                  setState(() {
-                    studentId = value;
-                  });
-                }),
+                    decoration: const InputDecoration(
+                        hintText: 'Enter Lowercase Entry no. '),
+                    onChanged: (value) {
+                      setState(() {
+                        studentId = value;
+                      });
+                    }),
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      await widget.database.addStudentToCourse(studentId, widget.course.courseReferenceId);
+                      await widget.database.addStudentToCourse(
+                          studentId, widget.course.courseReferenceId);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Add'),
@@ -459,18 +514,18 @@ class _CourseSettingsState extends State<CourseSettings> {
             return AlertDialog(
                 title: const Text('Remove Student'),
                 content: TextField(
-                  decoration: const InputDecoration(
-                    hintText: 'Enter Lowercase Entry no. '
-                  ),
-                  onChanged: (value) {
-                  setState(() {
-                    studentId = value;
-                  });
-                }),
+                    decoration: const InputDecoration(
+                        hintText: 'Enter Lowercase Entry no. '),
+                    onChanged: (value) {
+                      setState(() {
+                        studentId = value;
+                      });
+                    }),
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      await widget.database.removeStudentFromCourse(studentId, widget.course.courseReferenceId);
+                      await widget.database.removeStudentFromCourse(
+                          studentId, widget.course.courseReferenceId);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Remove'),
@@ -496,7 +551,8 @@ class _CourseSettingsState extends State<CourseSettings> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      await widget.database.deleteCourse(widget.course.courseReferenceId);
+                      await widget.database
+                          .deleteCourse(widget.course.courseReferenceId);
                       Navigator.of(context).pop();
                       Navigator.pop(context, true);
                       await widget.onUpdate();
@@ -554,7 +610,6 @@ class _CourseSettingsState extends State<CourseSettings> {
   }
 }
 
-
 class CSVUploaderWidget extends StatefulWidget {
   final String courseId;
 
@@ -565,19 +620,76 @@ class CSVUploaderWidget extends StatefulWidget {
 }
 
 class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
-  String _statusMessage = 'Ready to upload CSV';
+  String _statusMessage = '';
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ElevatedButton(
-          onPressed: _pickAndUploadCSV,
-          child: const Text('Pick and Upload CSV'),
+      // mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.green[600], // A more vibrant shade of blue
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(12.0), // Softer rounded corners
+                  ),
+                  elevation:
+                      5, // Slightly higher elevation for a more pronounced shadow
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical:
+                          12), // Improved padding for a better tactile feel
+                  textStyle: const TextStyle(
+                    letterSpacing:
+                        1.2, // Increase letter spacing for a more open look
+                  ),
+                ),
+                onPressed: _pickAndUploadCSV,
+                child: const Text(
+                  'Pick and Upload CSV',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            GestureDetector(
+              child: const Icon(
+                Icons.info,
+                size: 32,
+              ),
+              onTap: (){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext content){
+                    return AlertDialog(
+                      title: const Text('Required CSV Format', style: TextStyle(fontSize: 20),),
+                      content: Image.asset('assets/CSV_format.png', height: MediaQuery.of(context).size.height*0.25, width: MediaQuery.of(context).size.width*1, fit: BoxFit.fill),
+                    );
+                  });
+              },
+            ),
+          ],
         ),
-        const SizedBox(height: 20),
-        Text(_statusMessage),
+        const SizedBox(height: 10),
+        Text(
+          _statusMessage,
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
       ],
     );
   }
