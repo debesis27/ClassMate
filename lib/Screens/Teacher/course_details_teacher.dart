@@ -635,6 +635,7 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
   Future<Map<String, dynamic>> getStudentsMarks(String courseId) async{
     CollectionReference marksCollection = FirebaseFirestore.instance.collection('Courses').doc(courseId).collection('Marks');
     Map<String, dynamic> marksData = {};
+    Map<String, dynamic> maxMarks = {};
     bool isempty = true;
 
     await marksCollection.get().then((QuerySnapshot querySnapshot){
@@ -650,12 +651,15 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
             marksData[key] += (value ?? 0);
           });
         }
+      } else{
+        maxMarks = doc.data() as Map<String, dynamic>;
       }
       });
       if(numberOfStudents > 0){
         marksData.forEach((key, value) {
           marksData[key] = value/numberOfStudents;
-        });
+        marksData[key] =  '${marksData[key]} / ${maxMarks[key]}';
+      });
       }
     });
     return marksData;
@@ -739,7 +743,6 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
                 }
                 final stats = snapshot.data as Map<String, dynamic>;
                 return StudentsAverageStats(
-                  
                   marks: stats,
                 );
               },
@@ -768,6 +771,7 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
 
 class StudentsAverageStats extends StatelessWidget {
   final Map<String, dynamic> marks;
+  // final Map<String, dynamic> maxMarks;
 
   const StudentsAverageStats({
     super.key,
@@ -844,6 +848,7 @@ class StudentsAverageStats extends StatelessWidget {
                               ),
                             ],
                           ),
+                          
                         ],
                       );
                     },
