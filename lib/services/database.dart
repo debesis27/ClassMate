@@ -309,4 +309,39 @@ class Database {
     }
     return false;
   }
+
+  Future<Map<String, dynamic>> getStudentStats(String courseId) async {
+    // returns the stats of a particular student
+    CollectionReference attendanceCollection = courseCollection.doc(courseId).collection('Attendance');
+    int totalAttendance = 0;
+    int presentCount = 0;
+    int absentCount = 0;
+    await attendanceCollection.get().then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data[user.email!.substring(0, 11)] == true) {
+          presentCount++;
+        } else {
+          absentCount++;
+        }
+        totalAttendance++;
+      });
+    });
+    
+    Map<String, dynamic> studentStats = {};
+    
+    studentStats['totalCount'] = totalAttendance;
+    studentStats['presentCount'] = presentCount;
+    studentStats['absentCount'] = absentCount;
+
+    CollectionReference marksCollection = courseCollection.doc(courseId).collection('Marks');
+    DocumentSnapshot studentMarksDocument = await marksCollection.doc(user.email!.substring(0, 11)).get();
+    if (studentMarksDocument.exists) {
+      studentStats['Marks'] = studentMarksDocument.data() as Map<String, dynamic>;
+    } else {
+      studentStats['Marks'] = {};
+    }
+    print(studentStats.toString());
+    return studentStats;
+  }
 }
