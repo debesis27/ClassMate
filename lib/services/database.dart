@@ -298,5 +298,15 @@ class Database {
     await courseCollection.doc(courseId).collection('Attendance').doc(sessionId).update(todayAttendenceData);
   }
 
-  
+  Future<bool> isStudentPresentInCourseOnSession(String courseId, String sessionId) async {
+    DocumentSnapshot todayAttendenceDocumentSnapshot= await courseCollection.doc(courseId).collection('Attendance').doc(sessionId).get();
+    if (!todayAttendenceDocumentSnapshot.exists) {
+      return false;
+    }
+    Map<String, dynamic> todayAttendenceData = todayAttendenceDocumentSnapshot.data() as Map<String, dynamic>;
+    if (todayAttendenceData[user.email!.substring(0, 11)] == true) {
+      return true;
+    }
+    return false;
+  }
 }

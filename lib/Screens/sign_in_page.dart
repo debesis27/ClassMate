@@ -2,7 +2,6 @@ import 'package:ClassMate/Screens/Student/home_screen_student.dart';
 import 'package:ClassMate/Screens/Teacher/home_screen_teacher.dart';
 import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/Screens/register_page.dart';
-import 'package:ClassMate/bluetooth/advertising.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
