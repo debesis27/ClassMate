@@ -39,9 +39,13 @@ class _AccountPageState extends State<AccountPage> {
       appBar: AppBar(
         title: const Text(
           'My Account',
-          style: TextStyle(fontSize: 24),
+          style: TextStyle(
+            fontSize: 25, // Increase font size for better visibility
+            fontWeight: FontWeight.bold, // Added font weight for better readability
+          ),
         ),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).primaryColor, // A slightly deeper shade of blue
+        elevation: 4.0, // Increased elevation for a subtle shadow effect
       ),
       drawer: MyNavigationDrawer(
         isTeacher: widget.isTeacher,
@@ -78,18 +82,22 @@ class AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10), // Increased vertical margin for more space
+      elevation: 2, // Slightly higher elevation for a more pronounced shadow effect
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        leading: CircleAvatar(
-          radius: 35,
-          backgroundImage: NetworkImage(user.photoURL ?? ''),
-          backgroundColor: Colors.grey[200],
-        ),
-        title: Text(
-          user.displayName == null || user.displayName == "" ? '--' : user.displayName!,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      child: Padding(
+        padding: const EdgeInsets.all(5), // Added padding inside the card for a more spacious layout
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5), // Adjust the content padding within ListTile
+          leading: CircleAvatar(
+            radius: 25, // Maintain the same radius for the avatar
+            backgroundImage: NetworkImage(user.photoURL ?? ''),
+            backgroundColor: Colors.grey[200],
+          ),
+          title: Text(
+            user.displayName == null || user.displayName == "" ? 'User' : user.displayName!,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold), // Increased font size for better visibility
+          ),
         ),
       ),
     );
@@ -108,13 +116,14 @@ class AccountPersonalInfo extends StatefulWidget {
 }
 
 class _AccountPersonalInfoState extends State<AccountPersonalInfo> {
+  bool isNameUpdating = false;
   @override
   Widget build(BuildContext context) {
     String newName = '';
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Card(
-        elevation: 3,
+        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -130,7 +139,7 @@ class _AccountPersonalInfoState extends State<AccountPersonalInfo> {
                 icon: const Icon(Icons.edit),
                 label: const Text('Change Name', style: TextStyle(fontSize: 18),),
                 style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
-                onPressed: () {
+                onPressed: isNameUpdating ? null: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -149,10 +158,16 @@ class _AccountPersonalInfoState extends State<AccountPersonalInfo> {
                         actions: [
                           TextButton(
                             onPressed: () async {
+                              setState(() {
+                                isNameUpdating = true;
+                              });
+                              Navigator.of(context).pop();
                               await widget.user.updateDisplayName(newName);
                               await widget.refreshAccountPage();
                               await Database(user: widget.user).updateUserNameInDatabase(newName);
-                              Navigator.of(context).pop();
+                              setState(() {
+                                isNameUpdating = false;
+                              });
                             },
                             child: const Text('Submit'),
                           ),
@@ -232,16 +247,16 @@ class AccountLogoutCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
         child: Card(
-          elevation: 3,
+          elevation: 1.5,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
+          child: const Padding(
+            padding: EdgeInsets.all(15.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.exit_to_app, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 10),
-                const Text(
+                Icon(Icons.exit_to_app, color: Colors.red),
+                SizedBox(width: 10),
+                Text(
                   'Log Out',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 ),
@@ -300,7 +315,7 @@ class AccountDeleteCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
         child: Card(
-          elevation: 3,
+          elevation: 1.5,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: const Padding(
             padding: EdgeInsets.all(15.0),

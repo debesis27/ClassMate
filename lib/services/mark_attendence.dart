@@ -2,7 +2,7 @@ import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';  // For date formatting
 
-Future<Map<String, dynamic>> markAttendance(String courseId, {String sessionId = "", int timeout = 10}) async {
+Future<String> markAttendance(String courseId, {String sessionId = "", int timeout = 10}) async {
   // Reference to the attendance subcollection for the specified course
   CollectionReference courseAttendanceReference = FirebaseFirestore.instance.collection('Courses').doc(courseId).collection('Attendance');
   
@@ -31,13 +31,15 @@ Future<Map<String, dynamic>> markAttendance(String courseId, {String sessionId =
   // Mark the students present
   List<String> studentsToMarkPresent = await scanDevices(timeout: timeout);
   for (String studentId in studentsToMarkPresent) {
-    attendanceData[studentId] = true;
+    if (allStudesnts.contains(studentId)) {
+      attendanceData[studentId] = true;
+    }
   }
   // Create a new document with Session Id with the attendance data
   if (sessionId == "") {
-    await courseAttendanceReference.add(attendanceData);
-    return attendanceData;
+    await courseAttendanceReference.add(attendanceData).then((value) => sessionId = value.id);
+    return sessionId;
   }
   await courseAttendanceReference.doc(sessionId).set(attendanceData);
-  return attendanceData;
+  return sessionId;
 }

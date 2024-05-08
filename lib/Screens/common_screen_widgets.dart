@@ -11,6 +11,7 @@ import 'Student/course_details_student.dart';
 import 'Teacher/course_details_teacher.dart';
 import '../Datasource/images_data.dart';
 
+// builds a list of all courses for the user
 class AllCoursesList extends StatelessWidget {
   const AllCoursesList({
     super.key,
@@ -155,97 +156,96 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     //   );
     // }
 
-    return Drawer(
-      child: ListView(
-        children: [
-          const SizedBox(
-            height: 100, // Adjust the height as needed
-            child: DrawerHeader(
-              padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
-                color: Colors.blue,
-              ),
-              child: Text(
-                'ClassMate',
-                style: TextStyle(
-                  fontSize: 26,
-                  color: Colors.white,
-                ),
+   return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,  // Remove default padding for full usage of space
+      children: [
+        SizedBox(
+          height: 120, // Adjusted height for better visual impact
+          child: DrawerHeader(
+            margin: EdgeInsets.zero,  // Use the entire space for header
+            padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor, // Use theme's primary color for consistency
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
               ),
             ),
-          ),
-          ListTile(
-            title: const Text('Account'),
-            onTap: () {
-              widget.currentPage == "Account"
-                  ? Navigator.pop(context)
-                  : {
-                      Navigator.pop(context),
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AccountPage(
-                                  auth: auth,
-                                  user: user,
-                                  allCourses: widget.allCourses,
-                                  isTeacher: widget.isTeacher,
-                                  database: widget.database,
-                                  onUpdate: widget.onUpdate,)))
-                    };
-            },
-          ),
-          ListTile(
-            title: const Text('Classes'),
-            onTap: () {
-              widget.currentPage == "Classes"
-                  ? Navigator.pop(context)
-                  : {
-                      Navigator.pop(context),
-                      Navigator.pop(context),
-                    };
-            },
-          ),
-          // ListTile(
-          //   title: const Text('Tasks'),
-          //   onTap: () {
-          //     // Handle Tasks button tap
-          //   },
-          // ),
-          const Divider(),
-          const ListTile(
-            title: Text(
-              'All Classes',
+            child: const Text(
+              'ClassMate',
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontSize: 28, // Increased size for better visibility
+                color: Colors.black,
+                fontWeight: FontWeight.bold, // Bold for emphasis
               ),
             ),
           ),
-          Column(
-            children: widget.allCourses.map((course) {
-              return ListTile(
-                title: Text(course.courseCode),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => widget.isTeacher
-                          ? TeacherCourseDetailScreen(
-                              course: course, database: widget.database, onUpdate: widget.onUpdate,)
-                          : StudentCourseDetailScreen(
-                              course: course, database: widget.database, onUpdate: widget.onUpdate,),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
+        ),
+        ListTile(
+          leading: Icon(Icons.account_circle, color: Theme.of(context).iconTheme.color),  // Icons for better UX
+          title: const Text('Account'),
+          onTap: () {
+            widget.currentPage == "Account"
+                ? Navigator.pop(context)
+                : {
+                    Navigator.pop(context),
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AccountPage(
+                                auth: auth,
+                                user: user,
+                                allCourses: widget.allCourses,
+                                isTeacher: widget.isTeacher,
+                                database: widget.database,
+                                onUpdate: widget.onUpdate,)))
+                  };
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.class_, color: Theme.of(context).iconTheme.color), // Icons for classes
+          title: const Text('Classes'),
+          onTap: () {
+            widget.currentPage == "Classes"
+                ? Navigator.pop(context)
+                : {
+                    Navigator.pop(context),
+                    Navigator.pop(context),
+                  };
+          },
+        ),
+        const Divider(),
+        const ListTile(
+          title: Text(
+            'All Classes',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ],
-      ),
-    );
+        ),
+        ...widget.allCourses.map((course) {  // Use spread operator for cleaner code
+          return ListTile(
+            leading: Icon(Icons.book, color: Theme.of(context).iconTheme.color),  // Icons for each course
+            title: Text(course.courseCode),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => widget.isTeacher
+                      ? TeacherCourseDetailScreen(
+                          course: course, database: widget.database, onUpdate: widget.onUpdate,)
+                      : StudentCourseDetailScreen(
+                          course: course, database: widget.database, onUpdate: widget.onUpdate,),
+                ),
+              );
+            },
+          );
+        }).toList(),
+      ],
+    ),
+  );
+
   }
 }
 
@@ -266,8 +266,14 @@ class SkeletonHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Classes'),
-        backgroundColor: Colors.blue,
+        title: const Text(
+          'Classes',
+          style: TextStyle(
+            fontSize: 25, // Increase font size for better visibility
+            fontWeight: FontWeight.bold, // Added font weight for better readability
+          ),
+        ),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       drawer: MyNavigationDrawer(
         allCourses: const [],

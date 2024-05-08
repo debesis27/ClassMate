@@ -35,11 +35,11 @@ class _AddNewCourseState extends State<AddNewCourse> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: theme.primaryColor, // Use theme's primary color
+        backgroundColor: Theme.of(context).primaryColor, // Ensures use of the theme's primary color
         title: const Text('Add New Course'),
+        elevation: 4.0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -73,12 +73,29 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 },
               ),
             ),
-            _buildSaveButton(),
-            _buildCancelButton(),
+            SizedBox(height: 20),  // Provide space before buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,  // Use spaceEvenly for better distribution
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: _buildSaveButton(),
+                  ),
+                ),
+                // Expanded(
+                //   child: Padding(
+                //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                //     child: _buildCancelButton(),
+                //   ),
+                // ),
+              ],
+            ),
           ],
         ),
       ),
     );
+
   }
 
   Widget _buildTextField({required String label, required void Function(String) onChanged}) {
@@ -133,11 +150,27 @@ class _AddNewCourseState extends State<AddNewCourse> {
           await widget.onUpdate();
           Navigator.pop(context);
         },
-        style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-        child: const Text('Save'),
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(50), // Maintain a good touch size
+          backgroundColor: Colors.blue, // A more vibrant color
+          elevation: 2, // Slight elevation for 3D effect
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Better padding for aesthetics
+        ),
+        child: const Text(
+          'Save',
+          style: TextStyle(
+            fontSize: 16, // Larger text
+            fontWeight: FontWeight.bold, // Bold text
+            color: Colors.white, // White text for contrast
+          ),
+        ),
       ),
     );
   }
+
 
   Widget _buildCancelButton() {
     return Padding(

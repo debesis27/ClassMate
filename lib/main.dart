@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ClassMate',
       theme: ThemeData(
+        primaryColor: Color.fromARGB(255, 255, 255, 255), 
         primarySwatch: Colors.blue,
       ),
       home: const SignInPage(),
