@@ -213,7 +213,7 @@ class AttendanceResultOfToday extends StatelessWidget {
                   size: 100,
                 ),
                 Text(
-                  isPresent ? 'You have been marked present' : 'Your attendance is not taken yet',
+                  isPresent ? 'You have been marked present' : 'You have been marked absent',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -242,6 +242,8 @@ class StudentStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String attendancePercentage = presentCount/totalCount * 100 == 0 ? '0' : (presentCount/totalCount * 100).toStringAsFixed(2);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -278,7 +280,7 @@ class StudentStats extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$presentCount/$totalCount',
+                        '$presentCount/$totalCount ',
                         style: const TextStyle(
                           fontSize: 16.0,
                           color: Colors.green,

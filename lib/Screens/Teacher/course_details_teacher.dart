@@ -120,7 +120,19 @@ class _TeacherCourseDetailScreenState extends State<TeacherCourseDetailScreen> {
                       setCurrentSessionId: setCurrentSessionId),
             ),
             Center(
-              child: AttendanceStats(allStudents: students),
+              child: FutureBuilder(
+              future: widget.database.getAllStudentsdata(widget.course.courseReferenceId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return buildErrorWidget(context, snapshot.error, () {setState(() {});});
+                }
+                final students = snapshot.data as List<Student>;
+                return AttendanceStats(allStudents: students);
+              },
+              ),
             ),
             Center(
               child:
