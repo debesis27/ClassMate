@@ -339,7 +339,7 @@ class Database {
     if (studentMarksDocument.exists) {
       studentStats['Marks'] = studentMarksDocument.data() as Map<String, dynamic>;
     } else {
-      studentStats['Marks'] = {};
+      studentStats['Marks'] = {'No Quiz Marks Available': ''};
     }
     print(studentStats.toString());
     return studentStats;
