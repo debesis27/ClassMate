@@ -47,7 +47,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             _buildTextField(
-              label: 'Course Code',
+              label: 'Course Code', 
               onChanged: (value) => setState(() => courseCode = value),
             ),
             _buildTextField(
@@ -61,7 +61,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
             const SizedBox(height: 10),
             const Text(
               'Select Image',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             SizedBox(
               height: 120,
@@ -100,7 +100,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           TextField(
             decoration: InputDecoration(
               hintText: 'Enter $label',
