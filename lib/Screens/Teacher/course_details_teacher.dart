@@ -7,6 +7,8 @@ import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
 import 'package:ClassMate/services/mark_attendence.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -608,6 +610,36 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
   String _statusMessage = '';
 
   @override
+
+  Future<Map<String, dynamic>> getStudentsMarks(String courseId) async{
+    CollectionReference marksCollection = FirebaseFirestore.instance.collection('Courses').doc(courseId).collection('Marks');
+    Map<String, dynamic> marksData = {};
+    bool isempty = true;
+
+    await marksCollection.get().then((QuerySnapshot querySnapshot){
+      int numberOfStudents = querySnapshot.size-1;
+      querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      if(doc.id != 'max'){
+        if(isempty){
+          marksData.addAll(data);
+          isempty = false;
+        } else{
+          data.forEach((key, value) {
+            marksData[key] += (value ?? 0);
+          });
+        }
+      }
+      });
+      if(numberOfStudents > 0){
+        marksData.forEach((key, value) {
+          marksData[key] = value/numberOfStudents;
+        });
+      }
+    });
+    return marksData;
+  }
+
   Widget build(BuildContext context) {
     return Column(
       // mainAxisSize: MainAxisSize.min,
@@ -675,6 +707,22 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
         const SizedBox(
           height: 15,
         ),
+        FutureBuilder(
+              future: getStudentsMarks(widget.courseId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return buildErrorWidget(context, snapshot.error, () {setState(() {});});
+                }
+                final stats = snapshot.data as Map<String, dynamic>;
+                return StudentsAverageStats(
+                  
+                  marks: stats,
+                );
+              },
+              ),
       ],
     );
   }
@@ -694,5 +742,97 @@ class _CSVUploaderWidgetState extends State<CSVUploaderWidget> {
         _statusMessage = "Failed to upload: $error";
       });
     });
+  }
+}
+
+class StudentsAverageStats extends StatelessWidget {
+  final Map<String, dynamic> marks;
+
+  const StudentsAverageStats({
+    super.key,
+    required this.marks,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Average Marks',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 15.0),
+                  ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: marks.length,
+                    itemBuilder: (context, index) {
+                      final entry = marks.entries.toList()[index];
+                      final quizTitle = marks.keys.toList()[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (index != 0) // Add a divider before each quiz except the first one
+                            const Divider(),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(
+                              quizTitle,
+                              style: const TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Average Marks:',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                entry.value.toString(),
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
