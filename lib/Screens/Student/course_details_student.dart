@@ -1,11 +1,10 @@
 import 'package:ClassMate/Models/course_info_model.dart';
 import 'package:ClassMate/Models/session_info.dart';
 import 'package:ClassMate/Screens/common_screen_widgets.dart';
+import 'package:ClassMate/Screens/error_page.dart';
 import 'package:ClassMate/bluetooth/advertising.dart';
-// import 'package:ClassMate/bluetooth/ble_scan.dart';
 import 'package:ClassMate/services/database.dart';
 import 'package:ClassMate/services/get_sessions.dart';
-// import 'package:ClassMate/services/mark_attendence.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,7 +21,6 @@ class StudentCourseDetailScreen extends StatefulWidget {
 
 class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> with WidgetsBindingObserver {
   String currentSessionId = '';
-  bool isPresent = false;
 
   void setCurrentSessionId(String sessionId) {
     setState(() {
@@ -73,10 +71,24 @@ class _StudentCourseDetailScreenState extends State<StudentCourseDetailScreen> w
             Center(
               child: currentSessionId == ""
                 ? SessionManager(courseId: widget.course.courseReferenceId, entryNumber: widget.database.user.email!.substring(0, 11), setCurrentSessionId: setCurrentSessionId)
-                : AttendanceResultOfToday(isPresent: isPresent),
+                : AttendanceResultOfToday(sessionId: currentSessionId, courseId: widget.course.courseReferenceId, database: widget.database),
             ),
-            const Center(
-              child: StudentStats(totalAttendance: 10, quizMarks: {'Quiz 1': '10', 'Quiz 2': '20'}),
+            FutureBuilder(
+              future: widget.database.getStudentStats(widget.course.courseReferenceId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return buildErrorWidget(context, snapshot.error, () {setState(() {});});
+                }
+                final stats = snapshot.data as Map<String, dynamic>;
+                return StudentStats(
+                  presentCount: stats['presentCount'],
+                  totalCount: stats['totalCount'],
+                  quizMarks: stats['Marks'],
+                );
+              },
             ),
           ],
         ),
@@ -174,41 +186,57 @@ class _SessionManagerState extends State<SessionManager> {
 }
 
 class AttendanceResultOfToday extends StatelessWidget {
-  final bool isPresent;
+  final String sessionId;
+  final String courseId;
+  final Database database;
+  bool isPresent = false;
 
-  const AttendanceResultOfToday({super.key, required this.isPresent});
+  AttendanceResultOfToday({super.key, required this.sessionId, required this.courseId, required this.database, this.isPresent = false});
 
   @override
   Widget build (BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isPresent ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
-            color: isPresent ? Colors.green : Colors.red,
-            size: 100,
-          ),
-          Text(
-            isPresent ? 'You have been marked present' : 'Your attendance is not taken yet',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return FutureBuilder<bool>(
+      future: database.isStudentPresentInCourseOnSession(courseId, sessionId).then((value) => isPresent = value),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }else if(snapshot.hasError){
+          return const Center(child: Text('Error fetching attendance data'));
+        }else{
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isPresent ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
+                  color: isPresent ? Colors.green : Colors.red,
+                  size: 100,
+                ),
+                Text(
+                  isPresent ? 'You have been marked present' : 'Your attendance is not taken yet',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }
+      }
     );
   }
 }
 
 class StudentStats extends StatelessWidget {
-  final int totalAttendance;
-  final Map<String, String> quizMarks;
+  final int presentCount;
+  final int totalCount;
+  final Map<String, dynamic> quizMarks;
 
   const StudentStats({
     super.key,
-    required this.totalAttendance,
+    required this.presentCount,
+    required this.totalCount,
     required this.quizMarks,
   });
 
@@ -250,7 +278,7 @@ class StudentStats extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$totalAttendance%',
+                        '$presentCount/$totalCount',
                         style: const TextStyle(
                           fontSize: 16.0,
                           color: Colors.green,
@@ -290,7 +318,7 @@ class StudentStats extends StatelessWidget {
                     itemCount: quizMarks.length,
                     itemBuilder: (context, index) {
                       final entry = quizMarks.entries.toList()[index];
-                      final quizTitle = 'Quiz ${index + 1}';
+                      final quizTitle = quizMarks.keys.toList()[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -317,7 +345,7 @@ class StudentStats extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                entry.value,
+                                entry.value.toString(),
                                 style: const TextStyle(
                                   fontSize: 16.0,
                                   color: Colors.black87,

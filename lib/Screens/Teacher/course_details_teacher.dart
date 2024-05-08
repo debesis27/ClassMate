@@ -177,7 +177,7 @@ class _SessionManagerState extends State<SessionManager> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: isLoading ? null : () {
               createSession();
             },
             style: ElevatedButton.styleFrom(
