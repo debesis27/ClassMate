@@ -9,11 +9,13 @@ Future<String> markAttendance(String courseId, {String sessionId = "", int timeo
 
   //Setting the session id-
   // print('yaha tak aagya');
-  await courseAttendanceReference.get().then((QuerySnapshot querySnapshot){
-    int numberOfSessions = querySnapshot.size;
-    sessionId = (numberOfSessions+1).toString();
-    // print('creation $sessionId');
-  });
+  if(sessionId == ""){
+    await courseAttendanceReference.get().then((QuerySnapshot querySnapshot){
+      int numberOfSessions = querySnapshot.size;
+      sessionId = (numberOfSessions+1).toString();
+      // print('creation $sessionId');
+    });
+  }
   // print('yaha bhi aagya');
   
   // Get the list of all students in the course
@@ -25,9 +27,9 @@ Future<String> markAttendance(String courseId, {String sessionId = "", int timeo
   // reading the current data that is present in the session
   
   DocumentSnapshot sessionDoc = await courseAttendanceReference.doc(sessionId).get();
-  print(sessionId);
+  // print(sessionId);
   if(sessionDoc.exists){
-    print(sessionDoc);
+    // print(sessionDoc);
     attendanceData = sessionDoc.data() as Map<String, dynamic>;
     attendanceData['date'] = DateFormat('yyyy-MM-dd').format(DateTime.now());
     attendanceData['time'] = DateFormat('HH:mm:ss').format(DateTime.now());
@@ -38,7 +40,7 @@ Future<String> markAttendance(String courseId, {String sessionId = "", int timeo
     for (String studentId in allStudesnts) {
       attendanceData[studentId] = false;
     }
-    print(attendanceData);
+    // print(attendanceData);
   }
   
   // Mark the students present

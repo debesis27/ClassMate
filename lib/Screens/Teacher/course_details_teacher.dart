@@ -243,8 +243,14 @@ class _AttendanceResultOfTodayState extends State<AttendanceResultOfToday> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
-                  onPressed: () {
-                    //TODO: Logic to handle on press
+                  onPressed: () async {
+                    setState(() {
+                      updating = true;
+                    });
+                    await markAttendance(widget.courseId, sessionId: widget.sessionId);
+                    setState(() {
+                      updating = false;
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent, // A more vibrant shade of blue
