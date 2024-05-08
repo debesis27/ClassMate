@@ -406,30 +406,49 @@ class AttendanceStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sort students by entryNumber
+    List<Student> sortedStudents = List.from(allStudents)..sort((a, b) => a.entryNumber.compareTo(b.entryNumber));
+
     return ListView.builder(
-        itemCount: allStudents.length,
-        itemBuilder: (context, index) {
-          Student student = allStudents[index];
-          return Card(
-            child: ExpansionTile(
-              title: Text('${student.name} (${student.entryNumber})'),
-              children: <Widget>[
-                ListTile(
-                  title: Text('Total Attendance: ${student.totalAttendance}'),
+      itemCount: sortedStudents.length,
+      itemBuilder: (context, index) {
+        Student student = sortedStudents[index];
+        return Card(
+          elevation: 3, // Adds shadow under the card for a subtle depth effect
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: ExpansionTile(
+            leading: Icon(Icons.school), // Icon for visual flair
+            title: Text(student.entryNumber, style: Theme.of(context).textTheme.titleLarge),
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(student.name, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.left),
+                      Text('Total Attendance: ${student.totalAttendance}', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.left),
+                      if (student.marks.isNotEmpty) // Check if marks are available
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: student.marks.entries.map((entry) {
+                              return Text('${entry.key}: ${entry.value}', style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.left);
+                            }).toList(),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-                 if (student.marks.isNotEmpty) // Check if marks are available
-                    ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: student.marks.entries.map((entry) {
-                          return Text('${entry.key}: ${entry.value}');
-                        }).toList(),
-                      ),
-                    ),
-              ],
-            ),
-          );
-        });
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
