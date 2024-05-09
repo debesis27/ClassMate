@@ -7,8 +7,8 @@ This Flutter app is designed to streamline attendance management and marks recor
 
 * [Features](#Features)
 * [Screenshots](#Screenshots)
-* [Tech Stack](#Tech)
-* [Getting Started](#Installation)
+* [Tech Stack](#Tech-Stack)
+* [Getting Started](#Getting-Started)
 * [Authors](#Authors)
 ## Features
 
@@ -22,14 +22,14 @@ This Flutter app is designed to streamline attendance management and marks recor
 
 | Screens                  | Screenshots                                                  |
 |:-------------------------|:-------------------------------------------------------------|
-| Login              | <img src="/ReadMe-Images/ss-1.jpg" width="350" height="630"> |
-| Account            | <img src="/ReadMe-Images/ss-2.jpg" width="350" height="630"> |
-| My courses       | <img src="/ReadMe-Images/ss-3.jpg" width="350" height="630"> |
-| Session list        | <img src="/ReadMe-Images/ss-4.jpg" width="350" height="630"> |
-| Attendance Result  | <img src="/ReadMe-Images/ss-5.jpg" width="350" height="630"> |
-| All Students              | <img src="/ReadMe-Images/ss-6.jpg" width="350" height="630"> |
-| Marks Upload              | <img src="/ReadMe-Images/ss-7.jpg" width="350" height="630"> |
-| Create course              | <img src="/ReadMe-Images/ss-9.jpg" width="350" height="630"> |
+| Login              | <img src="/ReadMe-Images/ss-1.png" width="350" height="630"> |
+| Account            | <img src="/ReadMe-Images/ss-2.png" width="350" height="630"> |
+| My courses       | <img src="/ReadMe-Images/ss-3.png" width="350" height="630"> |
+| Session list        | <img src="/ReadMe-Images/ss-4.png" width="350" height="630"> |
+| Attendance Result  | <img src="/ReadMe-Images/ss-5.png" width="350" height="630"> |
+| All Students              | <img src="/ReadMe-Images/ss-6.png" width="350" height="630"> |
+| Marks Upload              | <img src="/ReadMe-Images/ss-7.png" width="350" height="630"> |
+| Create course              | <img src="/ReadMe-Images/ss-9.png" width="350" height="630"> |
 
 ## Tech Stack
 
@@ -54,3 +54,4 @@ To get started with the app, follow these steps:
 - [Jignesh Agrawal](https://github.com/agjignesh)
 - [Mohit Soni](https://github.com/itsmemohitsoni)
 - [Shivam Maske](https://github.com/debesis27)
+
