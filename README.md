@@ -12,10 +12,10 @@ This Flutter app is designed to streamline attendance management and marks recor
 * [Authors](#Authors)
 ## Features
 
-- **Attendance Management**: Utilizing BLE technology, teachers can efficiently take attendance of students present in the class.
-- **Marks Recording**: Teachers can upload students' marks effortlessly by uploading a CSV file.
+- **Attendance Management**: Utilizing BLE technology, teachers can efficiently take attendance of students present in the class preventing major methods of making a proxy.
+- **Marks Recording**: Teachers can upload student's marks effortlessly by uploading a CSV file.
 - **Firebase Integration**: Seamlessly integrates with Firebase for real-time database management and authentication.
-- **Detailed Statistics**: Provides detailed summary reports for both attendance statistics and quiz marks for students and teachers.
+- **Detailed Statistics**: Provides detailed summary reports for both attendance and marks statistics for students and teachers.
 - **Google Account Authentication**: Allows users to log in/log out using their Google accounts, ensuring security and ease of use.
 
 ## Screenshots
