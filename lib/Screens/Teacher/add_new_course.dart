@@ -51,22 +51,68 @@ class _AddNewCourseState extends State<AddNewCourse> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            _buildTextField(
-              label: 'Course Code', 
-              onChanged: (value) => setState(() => courseCode = value),
+            Padding(
+              padding: const EdgeInsets.only(top: 0.0, bottom: 20.0),
+              child: TextField(
+                keyboardType: TextInputType.visiblePassword,
+                textCapitalization: TextCapitalization.words,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                cursorWidth: 2,
+                cursorColor: Colors.deepPurple,
+                autocorrect: true,
+                decoration: InputDecoration(
+                  hintText: 'Enter Course title',
+                  label: const Text('Course Title', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                ),
+                onChanged: (value) => setState(() {
+                  courseTitle = value;
+                }),
+              ),
             ),
-            _buildTextField(
-              label: 'Course Title',
-              onChanged: (value) => setState(() => courseTitle = value),
+            Padding(
+              padding: const EdgeInsets.only(top: 0.0, bottom: 20.0),
+              child: TextField(
+                keyboardType: TextInputType.visiblePassword,
+                textCapitalization: TextCapitalization.characters,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                cursorColor: Colors.deepPurple,
+                autocorrect: true,
+                decoration: InputDecoration(
+                  hintText: 'Enter Course code',
+                  label: const Text('Course Code', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                ),
+                onChanged: (value) => setState(() {
+                  courseCode = value;
+                }),
+              ),
             ),
-            _buildTextField(
-              label: 'Academic Year',
-              onChanged: (value) => setState(() => academicYear = value),
+            Padding(
+              padding: const EdgeInsets.only(top: 0.0, bottom: 20.0),
+              child: TextField(
+                keyboardType: TextInputType.number,
+                textCapitalization: TextCapitalization.characters,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                cursorColor: Colors.deepPurple,
+                autocorrect: true,
+                decoration: InputDecoration(
+                  hintText: 'Enter Academic Year',
+                  label: const Text('Academic Year', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                ),
+                onChanged: (value) => setState(() {
+                  academicYear = value;
+                }),
+              ),
             ),
             const SizedBox(height: 10),
             const Text(
               'Select Image',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21),
             ),
             SizedBox(
               height: 120,
@@ -80,11 +126,13 @@ class _AddNewCourseState extends State<AddNewCourse> {
             ),
             const SizedBox(height: 20),  // Provide space before buttons
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,  // Use spaceEvenly for better distribution
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Use spaceEvenly for better distribution
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: _buildSaveButton(),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: _buildSaveButton(),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -101,20 +149,15 @@ class _AddNewCourseState extends State<AddNewCourse> {
 
   Widget _buildTextField({required String label, required void Function(String) onChanged}) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Enter $label',
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
-            ),
-            onChanged: onChanged,
-          ),
-        ],
+      padding: const EdgeInsets.only(top: 0.0, bottom: 20.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Enter $label',
+          label: Text('$label', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+        ),
+        onChanged: onChanged,
       ),
     );
   }
@@ -151,19 +194,21 @@ class _AddNewCourseState extends State<AddNewCourse> {
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(50), // Maintain a good touch size
-          backgroundColor: Colors.blue, // A more vibrant color
-          elevation: 2, // Slight elevation for 3D effect
+          fixedSize: const Size(200, 50),
+          backgroundColor: Colors.red, // A more vibrant color
+          elevation: 5,
+          shadowColor: Colors.redAccent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(200), // Rounded corners
+            borderRadius: BorderRadius.circular(18),
+            side: const BorderSide(color: Colors.white, width: 2)// Rounded corners
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Better padding for aesthetics
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), // Better padding for aesthetics
         ),
         child: const Text(
-          'Save',
+          'Create',
           style: TextStyle(
-            fontSize: 16, // Larger text
-            fontWeight: FontWeight.bold, // Bold text
+            fontSize: 20, // Larger text
+            fontWeight: FontWeight.w600, // Bold text
             color: Colors.white, // White text for contrast
           ),
         ),
@@ -174,10 +219,23 @@ class _AddNewCourseState extends State<AddNewCourse> {
   Widget _buildCancelButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: OutlinedButton(
+      child: ElevatedButton(
         onPressed: () => Navigator.pop(context),
-        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-        child: const Text('Cancel'),
+        style: ElevatedButton.styleFrom(
+          fixedSize: const Size(200, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(color: Colors.white, width: 2)
+          ),
+          backgroundColor: Colors.white,
+          elevation: 5,
+          shadowColor: Colors.grey
+        ),
+        child: const Text('Cancel', style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.black
+        ),),
       ),
     );
   }
