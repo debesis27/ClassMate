@@ -61,6 +61,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 cursorColor: Colors.deepPurple,
                 autocorrect: true,
                 decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.title, color: Colors.deepPurple, size: 30,),
                   hintText: 'Enter Course title',
                   label: const Text('Course Title', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
@@ -80,6 +81,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 cursorColor: Colors.deepPurple,
                 autocorrect: true,
                 decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.code, color: Colors.deepPurple, size: 30,),
                   hintText: 'Enter Course code',
                   label: const Text('Course Code', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
@@ -99,6 +101,7 @@ class _AddNewCourseState extends State<AddNewCourse> {
                 cursorColor: Colors.deepPurple,
                 autocorrect: true,
                 decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.calendar_today, color: Colors.deepPurple, size: 30,),
                   hintText: 'Enter Academic Year',
                   label: const Text('Academic Year', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
@@ -204,13 +207,19 @@ class _AddNewCourseState extends State<AddNewCourse> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), // Better padding for aesthetics
         ),
-        child: const Text(
-          'Create',
-          style: TextStyle(
-            fontSize: 20, // Larger text
-            fontWeight: FontWeight.w600, // Bold text
-            color: Colors.white, // White text for contrast
-          ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_box_rounded, size: 30, color: Colors.white,), // Icon for better visibility
+            Text(
+              ' Create',
+              style: TextStyle(
+                fontSize: 20, // Larger text
+                fontWeight: FontWeight.w600, // Bold text
+                color: Colors.white, // White text for contrast
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -231,11 +240,17 @@ class _AddNewCourseState extends State<AddNewCourse> {
           elevation: 5,
           shadowColor: Colors.grey
         ),
-        child: const Text('Cancel', style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: Colors.black
-        ),),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.cancel, size: 30, color: Colors.black),
+            Text(' Cancel', style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.black
+            ),),
+          ],
+        ),
       ),
     );
   }
